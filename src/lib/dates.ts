@@ -65,11 +65,12 @@ export const formatDate = (d: Date) => longDate.format(d)
 export const formatDayMonth = (d: Date) => dayMonth.format(d)
 export const formatDayNumber = (d: Date) => dayOnly.format(d)
 
-export function weekRangeLabel(key: WeekKey) {
+export function weekRangeLabel(key: WeekKey, { year = true }: { year?: boolean } = {}) {
   const start = fromDateKey(key)
   const end = addDays(start, 6)
   const sameMonth = start.getMonth() === end.getMonth()
-  return `${sameMonth ? dayOnly.format(start) : dayMonth.format(start)} – ${longDate.format(end)}`
+  const endLabel = year ? longDate.format(end) : dayMonth.format(end)
+  return `${sameMonth ? dayOnly.format(start) : dayMonth.format(start)} – ${endLabel}`
 }
 
 export const monthKeyOf = (d: Date = new Date()): MonthKey =>

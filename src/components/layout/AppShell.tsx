@@ -1,4 +1,4 @@
-import { Check, ChevronLeft, ChevronRight, CircleAlert, LoaderCircle, Menu } from 'lucide-react'
+import { CalendarCheck, Check, ChevronLeft, ChevronRight, CircleAlert, LoaderCircle, Menu } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
@@ -15,9 +15,10 @@ import { NAV_ITEMS, PRIMARY_MOBILE, SECONDARY_MOBILE } from './nav'
 
 function Brand({ compact }: { compact?: boolean }) {
   return (
-    <Link to="/" className="group flex min-w-0 items-center gap-3" aria-label="Fit Track, home">
+    <Link to="/" className={cn('group flex min-w-0 items-center', compact ? 'gap-2' : 'gap-3')} aria-label="Fit Track, home">
       <LogoMark className={cn('transition-transform duration-300 group-hover:-rotate-6', compact && 'size-9')} />
-      <span className="min-w-0 leading-none">
+      {/* Logo, week switcher and controls need about 460px together, so phones show just the mark. */}
+      <span className={cn('min-w-0 leading-none', compact && 'hidden min-[460px]:block')}>
         <Wordmark height={compact ? 18 : 22} />
         {!compact && (
           <span className="mt-1.5 block text-[11px] font-medium whitespace-nowrap text-muted-foreground">
@@ -60,15 +61,29 @@ function WeekSwitcher() {
       <Button variant="ghost" size="icon-sm" aria-label="Previous week" onClick={() => setWeek(shiftWeek(week, -1))}>
         <ChevronLeft aria-hidden />
       </Button>
-      <div className="min-w-0 px-1 text-center leading-tight" aria-live="polite">
-        <div className="font-display text-base font-extrabold whitespace-nowrap">Week {isoWeekNumber(week)}</div>
-        <div className="text-[11px] whitespace-nowrap text-muted-foreground">{weekRangeLabel(week)}</div>
-      </div>
+      {/* On phones, tapping the label returns to this week; wider screens get a separate button. */}
+      <button
+        type="button"
+        disabled={week === current}
+        onClick={() => setWeek(current)}
+        aria-label={week === current ? undefined : `Week ${isoWeekNumber(week)}, ${weekRangeLabel(week)}. Go to this week`}
+        className="shrink-0 rounded-lg px-1 text-center leading-tight enabled:cursor-pointer disabled:cursor-default sm:pointer-events-none"
+      >
+        <span aria-live="polite" className="flex items-center justify-center gap-1 font-display text-base font-extrabold whitespace-nowrap">
+          {week !== current && <CalendarCheck className="size-3.5 text-primary sm:hidden" aria-hidden />}
+          Week {isoWeekNumber(week)}
+        </span>
+        <span className="block text-[11px] whitespace-nowrap text-muted-foreground">
+          <span className="sm:hidden">{weekRangeLabel(week, { year: false })}</span>
+          <span className="hidden sm:inline">{weekRangeLabel(week)}</span>
+        </span>
+      </button>
       <Button variant="ghost" size="icon-sm" aria-label="Next week" onClick={() => setWeek(shiftWeek(week, 1))}>
         <ChevronRight aria-hidden />
       </Button>
       {week !== current && (
-        <Button variant="outline" size="sm" onClick={() => setWeek(current)} className="ml-1">
+        <Button variant="outline" size="sm" onClick={() => setWeek(current)} className="ml-1 hidden sm:inline-flex">
+          <CalendarCheck aria-hidden />
           This week
         </Button>
       )}
@@ -174,7 +189,8 @@ function MobileDock() {
       <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
         <SheetContent side="bottom" className="glass-strong rounded-t-3xl pb-[env(safe-area-inset-bottom)]">
           <SheetHeader>
-            <SheetTitle className="font-display text-xl font-extrabold">More</SheetTitle>
+            <Brand />
+            <SheetTitle className="mt-3 font-display text-xl font-extrabold">More</SheetTitle>
             <SheetDescription className="sr-only">Other sections of the hub</SheetDescription>
           </SheetHeader>
           <nav aria-label="More sections" className="grid gap-1 px-4 pb-4">

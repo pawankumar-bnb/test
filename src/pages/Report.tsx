@@ -229,7 +229,7 @@ export function ReportPage() {
               <span
                 role="img"
                 aria-label="Fit Track"
-                className="block h-5 w-[95px] bg-[#4f8e55]"
+                className="block h-5 w-[95px] bg-[#c2392f]"
                 style={{
                   WebkitMaskImage: `url(${wordmarkUrl})`,
                   maskImage: `url(${wordmarkUrl})`,
