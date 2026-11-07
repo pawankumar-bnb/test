@@ -1,4 +1,5 @@
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
+import { useResolvedTheme } from '@/lib/theme'
 
 /**
  * Toasts sit over the header bar, where there are no fields. At the bottom they cover
@@ -6,18 +7,20 @@ import { Toaster as Sonner, type ToasterProps } from 'sonner'
  * the next keystrokes go into the wrong box.
  */
 export function Toaster(props: ToasterProps) {
+  const theme = useResolvedTheme()
   return (
     <Sonner
-      theme="dark"
+      theme={theme}
       position="top-center"
-      offset={8}
-      mobileOffset={8}
+      offset={12}
+      mobileOffset={12}
       className="toaster group"
+      toastOptions={{ className: 'glass-strong !rounded-2xl' }}
       style={
         {
           '--normal-bg': 'var(--popover)',
           '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
+          '--normal-border': 'var(--glass-border)',
         } as React.CSSProperties
       }
       {...props}

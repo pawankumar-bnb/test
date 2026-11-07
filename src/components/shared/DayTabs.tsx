@@ -1,4 +1,5 @@
-import { type KeyboardEvent, useRef, useState } from 'react'
+import { motion } from 'motion/react'
+import { type KeyboardEvent, useId, useRef, useState } from 'react'
 import {
   DAY_LONG,
   DAY_SHORT,
@@ -37,6 +38,7 @@ export function DayTabs({
   label: string
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
+  const id = useId()
   const today = todayKey()
 
   function onKeyDown(event: KeyboardEvent) {
@@ -49,7 +51,7 @@ export function DayTabs({
   }
 
   return (
-    <div role="tablist" aria-label={label} className="mb-5 grid grid-cols-7 gap-1.5" onKeyDown={onKeyDown}>
+    <div role="tablist" aria-label={label} className="isolate mb-6 grid grid-cols-7 gap-1.5 md:gap-2" onKeyDown={onKeyDown}>
       {DAY_INDEXES.map((d) => {
         const date = dateOfDay(week, d)
         const isToday = toDateKey(date) === today
@@ -68,29 +70,34 @@ export function DayTabs({
             aria-label={`${DAY_LONG[d - 1]} ${formatDayNumber(date)}${isToday ? ', today' : ''}${logged ? ', logged' : ''}`}
             onClick={() => onChange(d)}
             className={cn(
-              'relative flex min-h-14 cursor-pointer flex-col items-center justify-center rounded-lg border text-center transition-colors duration-150',
-              selected
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border bg-card text-foreground hover:border-muted-foreground/50',
+              'relative flex min-h-16 cursor-pointer flex-col items-center justify-center rounded-2xl text-center transition-colors duration-200',
+              selected ? 'text-primary-foreground' : 'glass spotlight text-foreground',
             )}
           >
-            <span className={cn('text-[11px]', !selected && 'text-muted-foreground')}>
+            {selected && (
+              <motion.span
+                layoutId={`${id}-day`}
+                className="absolute inset-0 -z-10 rounded-2xl bg-brand-gradient glow"
+                transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+              />
+            )}
+            <span className={cn('text-[11px] font-semibold', !selected && 'text-muted-foreground')}>
               {DAY_SHORT[d - 1]}
             </span>
-            <span className="font-display text-xl leading-none font-semibold tabular-nums">
+            <span className="font-display text-xl leading-none font-black tabular-nums">
               {formatDayNumber(date)}
             </span>
             {logged && (
               <span
                 aria-hidden
                 className={cn(
-                  'absolute top-1.5 right-1.5 size-1.5 rounded-full',
-                  selected ? 'bg-primary-foreground' : 'bg-primary',
+                  'absolute top-2 right-2 size-1.5 rounded-full',
+                  selected ? 'bg-primary-foreground' : 'bg-primary shadow-[0_0_8px_rgb(var(--glow))]',
                 )}
               />
             )}
             {isToday && !selected && (
-              <span aria-hidden className="absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary" />
+              <span aria-hidden className="absolute inset-x-4 bottom-1.5 h-0.5 rounded-full bg-primary" />
             )}
           </button>
         )

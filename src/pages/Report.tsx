@@ -1,6 +1,7 @@
 import { Printer, RotateCcw, Stamp } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { DailyBarChart, LineTrendChart } from '@/components/charts/charts'
+import { markUrl, wordmarkUrl } from '@/components/brand/Logo'
 import { PageHeader } from '@/components/shared/page'
 import { Button } from '@/components/ui/button'
 import { DAY_LONG, DAY_SHORT, addDays, fromDateKey, isoWeekNumber, monthKeyOfWeek, monthLabel, toDateKey, weekRangeLabel } from '@/lib/dates'
@@ -220,9 +221,25 @@ export function ReportPage() {
         />
       </div>
 
-      <article className="report-paper rounded-2xl bg-[#f6f7f3] p-5 text-[#101214] md:p-8">
+      <article className="report-paper rounded-3xl bg-[#fbfcf9] p-5 text-[#101214] shadow-[0_30px_80px_-30px_rgb(0_0_0/0.35)] md:p-8">
         <header className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-[#101214] pb-3">
           <div>
+            <div className="mb-3 flex items-center gap-2">
+              <img src={markUrl} alt="" className="size-8 rounded-lg" />
+              <span
+                role="img"
+                aria-label="Fit Track"
+                className="block h-5 w-[95px] bg-[#4f8e55]"
+                style={{
+                  WebkitMaskImage: `url(${wordmarkUrl})`,
+                  maskImage: `url(${wordmarkUrl})`,
+                  WebkitMaskSize: 'contain',
+                  maskSize: 'contain',
+                  WebkitMaskRepeat: 'no-repeat',
+                  maskRepeat: 'no-repeat',
+                }}
+              />
+            </div>
             <h1 className="font-display text-3xl leading-none font-bold tracking-tight uppercase">
               Rafey: weekly personal performance report
             </h1>
@@ -403,10 +420,10 @@ export function ReportPage() {
 
         <ReportSection title="Performance graphs">
           <div className="grid gap-2 md:grid-cols-2 print:grid-cols-2">
-            <LineTrendChart theme="light" height={140} title="Weight" subtitle="By week, kg" unit="kg" data={timeline} series={[{ key: 'weight', name: 'Weight' }]} />
-            <LineTrendChart theme="light" height={140} title="Body fat" subtitle="By week, %" unit="%" data={timeline} series={[{ key: 'bf', name: 'Body fat' }]} />
+            <LineTrendChart theme="paper" height={140} title="Weight" subtitle="By week, kg" unit="kg" data={timeline} series={[{ key: 'weight', name: 'Weight' }]} />
+            <LineTrendChart theme="paper" height={140} title="Body fat" subtitle="By week, %" unit="%" data={timeline} series={[{ key: 'bf', name: 'Body fat' }]} />
             <LineTrendChart
-              theme="light"
+              theme="paper"
               height={148}
               title="Measurements"
               subtitle="By week, cm"
@@ -419,11 +436,11 @@ export function ReportPage() {
                 { key: 'neck', name: 'Neck', slot: 3 },
               ]}
             />
-            <DailyBarChart theme="light" height={148} title="Calories burned" subtitle="Daily, kcal" unit="kcal" data={days} series={[{ key: 'burn', name: 'Calories burned' }]} />
-            <DailyBarChart theme="light" height={148} title="Calories intake" subtitle="Daily, kcal" unit="kcal" data={days} series={[{ key: 'cal', name: 'Calories' }]} />
-            <DailyBarChart theme="light" height={148} title="Protein" subtitle="Daily, grams" unit="g" data={days} series={[{ key: 'pro', name: 'Protein' }]} />
+            <DailyBarChart theme="paper" height={148} title="Calories burned" subtitle="Daily, kcal" unit="kcal" data={days} series={[{ key: 'burn', name: 'Calories burned' }]} />
+            <DailyBarChart theme="paper" height={148} title="Calories intake" subtitle="Daily, kcal" unit="kcal" data={days} series={[{ key: 'cal', name: 'Calories' }]} />
+            <DailyBarChart theme="paper" height={148} title="Protein" subtitle="Daily, grams" unit="g" data={days} series={[{ key: 'pro', name: 'Protein' }]} />
             <DailyBarChart
-              theme="light"
+              theme="paper"
               height={148}
               title="Macro pattern"
               subtitle="Daily carbs, fat and fiber, grams"
@@ -435,7 +452,7 @@ export function ReportPage() {
                 { key: 'fiber', name: 'Fiber', slot: 2 },
               ]}
             />
-            <DailyBarChart theme="light" height={148} title="Cardio minutes" subtitle="Daily total" unit="min" data={days} series={[{ key: 'cardio', name: 'Cardio' }]} />
+            <DailyBarChart theme="paper" height={148} title="Cardio minutes" subtitle="Daily total" unit="min" data={days} series={[{ key: 'cardio', name: 'Cardio' }]} />
           </div>
         </ReportSection>
 

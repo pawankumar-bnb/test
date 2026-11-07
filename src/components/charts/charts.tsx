@@ -12,23 +12,35 @@ import {
   YAxis,
 } from 'recharts'
 import { formatNumber } from '@/lib/metrics'
+import { useResolvedTheme } from '@/lib/theme'
 
 /**
  * Categorical slots validated for colour-blind separation and contrast on each
- * surface. Series keep their slot across every chart; single-series charts use slot 0.
+ * surface. Series keep their slot across every chart; single-series charts use the accent.
+ * `paper` is the printed report: always light, whatever the app theme.
  */
 const THEMES = {
   dark: {
-    surface: '#11161b',
-    grid: '#232c34',
-    axis: '#93a0aa',
-    text: '#f2f5f7',
-    muted: '#a4afb8',
-    tooltip: '#1b2229',
-    accent: '#d8ff45',
-    series: ['#82a31a', '#3f8fe6', '#d4722a', '#9d70ec', '#0f9d83'],
+    surface: '#0d1712',
+    grid: 'rgba(255,255,255,0.08)',
+    axis: '#9fb5a8',
+    text: '#ecf5ef',
+    muted: '#9fb5a8',
+    tooltip: 'rgba(12,24,18,0.94)',
+    accent: '#86d97a',
+    series: ['#45a24a', '#3f8fe6', '#d4722a', '#9d70ec', '#0f9d83'],
   },
   light: {
+    surface: '#f4faf5',
+    grid: 'rgba(15,32,22,0.08)',
+    axis: '#4a5f52',
+    text: '#0f2016',
+    muted: '#4a5f52',
+    tooltip: 'rgba(250,253,251,0.95)',
+    accent: '#3f7f46',
+    series: ['#2e7d32', '#1d6fd1', '#c2570c', '#7c4dd6', '#0f8a6a'],
+  },
+  paper: {
     surface: '#ffffff',
     grid: '#e4e7e2',
     axis: '#5d666d',
@@ -41,6 +53,12 @@ const THEMES = {
 } as const
 
 export type ChartTheme = keyof typeof THEMES
+
+/** Charts follow the app theme unless told otherwise (the report asks for paper). */
+function useChartTheme(theme: ChartTheme | undefined): ChartTheme {
+  const app = useResolvedTheme()
+  return theme ?? app
+}
 
 export interface ChartSeries {
   key: string
@@ -101,7 +119,7 @@ function ChartTooltip({
   if (!active || !payload?.length) return null
   return (
     <div
-      className="rounded-lg border px-3 py-2 text-xs shadow-lg"
+      className="rounded-xl border px-3 py-2 text-xs shadow-xl backdrop-blur-xl"
       style={{ background: t.tooltip, borderColor: t.grid, color: t.text }}
     >
       <div className="mb-1" style={{ color: t.muted }}>
@@ -154,17 +172,17 @@ function ChartFrame({
   return (
     <figure
       className={
-        theme === 'dark'
-          ? 'chart-frame m-0 rounded-xl border border-border bg-card p-4'
-          : 'chart-frame m-0 rounded-lg border border-[#dfe2dc] bg-white p-3'
+        theme === 'paper'
+          ? 'chart-frame m-0 rounded-lg border border-[#dfe2dc] bg-white p-3'
+          : 'chart-frame glass spotlight m-0 rounded-2xl p-4'
       }
     >
       <figcaption className="mb-3">
-        <div className={theme === 'dark' ? 'text-sm font-semibold' : 'text-xs font-semibold text-[#101214]'}>
+        <div className={theme === 'paper' ? 'text-xs font-semibold text-[#101214]' : 'font-display text-sm font-extrabold'}>
           {title}
         </div>
         {subtitle && (
-          <div className={theme === 'dark' ? 'text-xs text-muted-foreground' : 'text-[10px] text-[#5d666d]'}>
+          <div className={theme === 'paper' ? 'text-[10px] text-[#5d666d]' : 'text-xs text-muted-foreground'}>
             {subtitle}
           </div>
         )}
@@ -201,7 +219,7 @@ function ChartArea({
   height: number
   children: ReactElement<{ width?: number; height?: number }>
 }) {
-  if (theme === 'light') {
+  if (theme === 'paper') {
     return (
       <div className="fixed-chart">
         {cloneElement(children, { width: REPORT_CHART_WIDTH, height })}
@@ -233,10 +251,11 @@ export function LineTrendChart({
   xKey = 'label',
   series,
   unit,
-  theme = 'dark',
+  theme: themeProp,
   height = 200,
   emptyText = 'Add records to see this trend.',
 }: ChartProps) {
+  const theme = useChartTheme(themeProp)
   const t = THEMES[theme]
   const single = series.length === 1
   return (
@@ -255,14 +274,14 @@ export function LineTrendChart({
                 domain={['auto', 'auto']}
                 tickFormatter={tickFormatter(data, series)}
               />
-              {theme === 'dark' && (
+              {theme !== 'paper' && (
                 <Tooltip
                   cursor={{ stroke: t.axis, strokeWidth: 1 }}
                   content={(props) => <ChartTooltip {...props} unit={unit} theme={theme} />}
                 />
               )}
               {series.map((s, i) => {
-                const color = single && theme === 'dark' ? t.accent : t.series[s.slot ?? i]
+                const color = single && theme !== 'paper' ? t.accent : t.series[s.slot ?? i]
                 return (
                   <Line
                     key={s.key}
@@ -295,11 +314,12 @@ export function DailyBarChart({
   xKey = 'label',
   series,
   unit,
-  theme = 'dark',
+  theme: themeProp,
   height = 200,
   emptyText = 'Log a few days to see this chart.',
   target,
 }: ChartProps) {
+  const theme = useChartTheme(themeProp)
   const t = THEMES[theme]
   return (
     <ChartFrame title={title} subtitle={subtitle} theme={theme}>
@@ -312,7 +332,7 @@ export function DailyBarChart({
               <CartesianGrid vertical={false} stroke={t.grid} />
               <XAxis dataKey={xKey} {...axisProps(theme)} />
               <YAxis {...axisProps(theme)} width={52} tickFormatter={tickFormatter(data, series)} />
-              {theme === 'dark' && (
+              {theme !== 'paper' && (
                 <Tooltip
                   cursor={{ fill: t.grid, fillOpacity: 0.4 }}
                   content={(props) => <ChartTooltip {...props} unit={unit} theme={theme} />}
@@ -321,7 +341,7 @@ export function DailyBarChart({
               {typeof target === 'number' && <ReferenceLine y={target} stroke={t.axis} />}
               {series.map((s, i) => {
                 const color =
-                  series.length === 1 && theme === 'dark' ? t.accent : t.series[s.slot ?? i]
+                  series.length === 1 && theme !== 'paper' ? t.accent : t.series[s.slot ?? i]
                 return (
                   <Bar
                     key={s.key}

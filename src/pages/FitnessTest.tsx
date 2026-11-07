@@ -28,7 +28,7 @@ function History({ tests, activeId, onSelect }: { tests: FitnessTest[]; activeId
     { label: 'Lat', value: (t) => t.lat || '—' },
   ]
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-card">
+    <div className="glass overflow-x-auto rounded-2xl">
       <table className="w-full min-w-[46rem] text-sm">
         <caption className="sr-only">Fitness test history, newest first</caption>
         <thead>

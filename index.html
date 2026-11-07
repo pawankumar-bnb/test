@@ -1,14 +1,27 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="icon" type="image/png" href="./favicon-64.png" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0d10" />
-    <meta name="description" content="Rafey's personal performance hub: training, nutrition, supplements, physique, goals and weekly reports." />
+    <meta name="theme-color" content="#e9f4ec" />
+    <meta name="description" content="Fit Track: Rafey's personal performance hub for training, nutrition, supplements, physique, goals and weekly reports." />
     <meta name="robots" content="noindex" />
-    <title>Rafey | Personal Performance Hub</title>
+    <title>Fit Track | Rafey's Performance Hub</title>
+    <script>
+      // Set the theme before first paint so the page never flashes the wrong one.
+      ;(function () {
+        try {
+          var pref = localStorage.getItem('fittrack-theme') || 'system'
+          var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+          var root = document.documentElement
+          root.classList.toggle('dark', dark)
+          root.style.colorScheme = dark ? 'dark' : 'light'
+          document.querySelector('meta[name=theme-color]').setAttribute('content', dark ? '#04100a' : '#e9f4ec')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

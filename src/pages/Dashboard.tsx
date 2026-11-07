@@ -1,7 +1,9 @@
-import { ArrowRight, CircleCheck, CircleDashed, Sparkles } from 'lucide-react'
+import { ArrowRight, CircleCheck, CircleDashed, Dumbbell, PartyPopper, Sparkles, Target, Utensils } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { LogoMark } from '@/components/brand/Logo'
 import { DailyBarChart } from '@/components/charts/charts'
+import { CountUp, Reveal } from '@/components/motion/motion'
 import { Field } from '@/components/shared/fields'
 import { GOAL_ICONS, GoalMeter, goalStatus, goalValueLine, toneClass } from '@/components/shared/goals'
 import { Panel, SectionHeading, StatTile } from '@/components/shared/page'
@@ -14,6 +16,7 @@ import {
   dayIndexOf,
   formatDate,
   fromDateKey,
+  greeting,
   isoWeekNumber,
   monthKeyOfWeek,
   monthLabel,
@@ -28,40 +31,47 @@ import {
   dayMacros,
   daySteps,
   formatNumber,
+  nutritionDays,
   round1,
+  trainingDays,
   valueAsOf,
   weekBurn,
   weekMacros,
   weekSteps,
-  withUnit,
 } from '@/lib/metrics'
 import type { GoalPeriod } from '@/lib/types'
 import { DAY_INDEXES } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { fitnessDraft, mutate, useHub, useMember, useSelectedWeek, useWeekData } from '@/store/hub'
 
+const decimal = (n: number) => formatNumber(n, 1)
+
 function GoalTile({ goal }: { goal: ResolvedGoal }) {
   const Icon = GOAL_ICONS[goal.metric.id]
   const status = goalStatus(goal)
   const pct = goal.progress.achievedPct
+  const reached = status.tone === 'good'
   return (
     <Link
       to="/goals"
-      className="group flex flex-col gap-2 rounded-xl border border-border bg-card p-4 transition-colors duration-150 hover:border-muted-foreground/50"
+      className="glass spotlight lift group flex h-full flex-col gap-2.5 rounded-2xl p-4 transition-transform duration-200"
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
-          <Icon className="size-4 shrink-0 text-primary" aria-hidden />
+        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+            <Icon className="size-4" aria-hidden />
+          </span>
           <span className="truncate">{goal.metric.label}</span>
         </span>
+        {reached && <PartyPopper className="float size-4 shrink-0 text-primary" aria-label="Target reached" />}
       </div>
-      <div className="font-display text-3xl leading-none font-bold tabular-nums">
-        {pct === null ? '—' : `${formatNumber(pct)}%`}
+      <div className="font-display text-3xl leading-none font-black tabular-nums">
+        {pct === null ? '—' : <><CountUp value={pct} format={decimal} />%</>}
       </div>
       <GoalMeter goal={goal} />
       <div className="min-h-8 text-xs leading-4">
         <div className="truncate text-muted-foreground">{goalValueLine(goal)}</div>
-        <div className={cn('font-medium', toneClass[status.tone])}>{status.text}</div>
+        <div className={cn('font-semibold', toneClass[status.tone])}>{status.text}</div>
       </div>
     </Link>
   )
@@ -70,9 +80,9 @@ function GoalTile({ goal }: { goal: ResolvedGoal }) {
 function WelcomeCard() {
   const dismiss = () => mutate((_, doc) => void (doc.importPromptDismissed = true))
   return (
-    <Panel className="mb-4 flex flex-col gap-3 border-primary/40 sm:flex-row sm:items-center sm:justify-between">
+    <Panel className="mb-5 flex flex-col gap-3 border-primary/40 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="font-semibold">Have data in the old tracker file?</h2>
+        <h2 className="font-display text-lg font-extrabold">Have data in the old tracker file?</h2>
         <p className="text-sm text-muted-foreground">
           Press Backup Data in the old file, then restore that backup here. Everything comes across, photos included.
         </p>
@@ -103,30 +113,32 @@ function TodayCard() {
     })
 
   return (
-    <Panel>
+    <Panel className="flex flex-col">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-display text-2xl font-semibold uppercase">Today</h2>
-        <span className="text-sm text-muted-foreground">{DAY_LONG[today - 1]}</span>
+        <h2 className="font-display text-2xl font-black">Today</h2>
+        <span className="text-sm font-medium text-muted-foreground">{DAY_LONG[today - 1]}</span>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Steps" numeric value={fitness?.steps ?? ''} onChange={(v) => set('steps', v)} />
         <Field label="Calories burned" numeric unit="kcal" value={fitness?.burn ?? ''} onChange={(v) => set('burn', v)} />
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-        <div>
-          <dt className="text-muted-foreground">Calories in</dt>
-          <dd className="font-semibold tabular-nums">{formatNumber(round1(macros.cal))} kcal</dd>
+        <div className="rounded-xl bg-accent/70 p-3">
+          <dt className="text-xs text-muted-foreground">Calories in</dt>
+          <dd className="font-display text-lg font-extrabold tabular-nums">{formatNumber(round1(macros.cal))} kcal</dd>
         </div>
-        <div>
-          <dt className="text-muted-foreground">Protein</dt>
-          <dd className="font-semibold tabular-nums">{formatNumber(round1(macros.pro))} g</dd>
+        <div className="rounded-xl bg-accent/70 p-3">
+          <dt className="text-xs text-muted-foreground">Protein</dt>
+          <dd className="font-display text-lg font-extrabold tabular-nums">{formatNumber(round1(macros.pro))} g</dd>
         </div>
       </dl>
       <div className="mt-4 flex flex-wrap gap-2">
         <Link to="/nutrition" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+          <Utensils aria-hidden />
           Log food
         </Link>
         <Link to="/fitness" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+          <Dumbbell aria-hidden />
           Log workout
         </Link>
       </div>
@@ -153,6 +165,7 @@ export function Dashboard() {
   const macros = weekMacros(data)
   const focus = smartFocus(member, week)
   const readiness = reportReadiness(member, week)
+  const firstName = member.name.trim().split(/\s+/)[0] || 'there'
 
   const chartData = DAY_INDEXES.map((d) => ({
     label: DAY_SHORT[d - 1],
@@ -161,56 +174,83 @@ export function Dashboard() {
     steps: daySteps(data.fitness[d]),
   }))
 
-  const snapshot = [
-    { label: 'Weight', value: withUnit(valueAsOf(member, 'weight', week), 'kg'), note: 'Physique' },
-    { label: 'Body fat', value: withUnit(valueAsOf(member, 'bf', week), '%'), note: 'Physique' },
-    { label: 'Calories burned', value: withUnit(weekBurn(data), 'kcal'), note: 'Fitness' },
-    { label: 'Steps', value: formatNumber(weekSteps(data), 0), note: 'Fitness' },
-    { label: 'Calories intake', value: withUnit(round1(macros.cal), 'kcal'), note: 'Nutrition' },
-    { label: 'Protein', value: withUnit(round1(macros.pro), 'g'), note: 'Nutrition' },
-    { label: 'Carbs', value: withUnit(round1(macros.carb), 'g'), note: 'Nutrition' },
-    { label: 'Fat', value: withUnit(round1(macros.fat), 'g'), note: 'Nutrition' },
-    { label: 'Fiber', value: withUnit(round1(macros.fiber), 'g'), note: 'Nutrition' },
+  const weight = valueAsOf(member, 'weight', week)
+  const bf = valueAsOf(member, 'bf', week)
+  const snapshot: { label: string; value: number | null; unit: string; note: string; digits?: number }[] = [
+    { label: 'Weight', value: weight, unit: ' kg', note: 'Physique', digits: 1 },
+    { label: 'Body fat', value: bf, unit: '%', note: 'Physique', digits: 1 },
+    { label: 'Calories burned', value: weekBurn(data), unit: ' kcal', note: 'Fitness' },
+    { label: 'Steps', value: weekSteps(data), unit: '', note: 'Fitness' },
+    { label: 'Calories intake', value: round1(macros.cal), unit: ' kcal', note: 'Nutrition' },
+    { label: 'Protein', value: round1(macros.pro), unit: ' g', note: 'Nutrition', digits: 1 },
+    { label: 'Carbs', value: round1(macros.carb), unit: ' g', note: 'Nutrition', digits: 1 },
+    { label: 'Fat', value: round1(macros.fat), unit: ' g', note: 'Nutrition', digits: 1 },
+    { label: 'Fiber', value: round1(macros.fiber), unit: ' g', note: 'Nutrition', digits: 1 },
+  ]
+
+  const chips = [
+    { icon: Dumbbell, text: `${trainingDays(data)}/7 training days` },
+    { icon: Utensils, text: `${nutritionDays(data)}/7 nutrition days` },
+    { icon: Target, text: summary ? `${summary.active}/${summary.total} goals active` : 'No goals set yet' },
   ]
 
   return (
     <>
       {showWelcome && <WelcomeCard />}
 
-      <section className="runway relative mb-6 flex flex-col gap-6 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
+      <section className="glass aurora relative mb-8 flex flex-col gap-8 rounded-3xl p-6 md:flex-row md:items-center md:justify-between md:p-9">
         <div className="min-w-0">
-          <p className="eyebrow">{isCurrent ? 'Current week · Monday to Sunday' : 'Past or planned week'}</p>
-          <h1 className="mt-2 font-display text-7xl leading-[0.85] font-bold tracking-tight uppercase md:text-8xl">
-            Week {isoWeekNumber(week)}
+          <p className="eyebrow">{isCurrent ? `${greeting()}, ${firstName}` : 'Past or planned week'}</p>
+          <h1 className="mt-2 font-display text-6xl leading-[0.9] font-black tracking-tight md:text-8xl">
+            <span className="text-gradient glow-text">Week {isoWeekNumber(week)}</span>
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
             {weekRangeLabel(week)}
             {isCurrent && ` · Today is ${DAY_LONG[dayIndexOf() - 1]}, ${formatDate(fromDateKey(todayKey()))}`}
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            <Link to="/report" className={buttonVariants()}>
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {chips.map(({ icon: Icon, text }, i) => (
+              <li
+                key={text}
+                className="glass float flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+                style={{ animationDelay: `${i * -2}s` }}
+              >
+                <Icon className="size-3.5 text-primary" aria-hidden />
+                {text}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <Link to="/report" className={buttonVariants({ size: 'lg' })}>
               Open weekly report
               <ArrowRight aria-hidden />
             </Link>
-            <Link to="/goals" className={buttonVariants({ variant: 'outline' })}>
+            <Link to="/goals" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
               Set goals
             </Link>
           </div>
         </div>
-        {summary && (
-          <div className="flex shrink-0 items-center gap-4">
-            <ProgressRing value={summary.score} label={`${period === 'weekly' ? 'Weekly' : 'Monthly'} goal score`} />
-            <div className="text-sm">
-              <div className="font-semibold">{period === 'weekly' ? 'Weekly' : 'Monthly'} goal score</div>
-              <div className="text-muted-foreground">
-                {summary.active} of {summary.total} goals active
+        <div className="flex shrink-0 items-center gap-5 self-center">
+          {summary ? (
+            <>
+              <ProgressRing value={summary.score} size={168} stroke={13} label={`${period === 'weekly' ? 'Weekly' : 'Monthly'} goal score`} />
+              <div className="text-sm">
+                <div className="font-display text-lg font-extrabold">{period === 'weekly' ? 'Weekly' : 'Monthly'} goal score</div>
+                <div className="text-muted-foreground">Average across active goals</div>
               </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-3 text-center">
+              <LogoMark className="float size-24 rounded-[26px]" />
+              <Link to="/goals" className="text-sm font-semibold text-primary hover:underline">
+                Set targets to see your score
+              </Link>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </section>
 
-      <section className="mb-8">
+      <section className="mb-9">
         <SectionHeading
           title="Goals"
           description={period === 'weekly' ? `Week ${isoWeekNumber(week)}` : monthLabel(month)}
@@ -227,41 +267,66 @@ export function Dashboard() {
           }
         />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-          {goals.map((goal) => (
-            <GoalTile key={goal.metric.id} goal={goal} />
+          {goals.map((goal, i) => (
+            <Reveal key={goal.metric.id} index={i} className="h-full">
+              <GoalTile goal={goal} />
+            </Reveal>
           ))}
         </div>
       </section>
 
-      <div className="mb-8 grid gap-4 lg:grid-cols-3">
-        {isCurrent && <TodayCard />}
-        <div className={cn('rounded-xl border border-primary/30 bg-primary/5 p-5', isCurrent ? 'lg:col-span-2' : 'lg:col-span-3')}>
-          <h2 className="flex items-center gap-2 font-display text-2xl font-semibold uppercase">
-            <Sparkles className="size-5 text-primary" aria-hidden />
-            Smart focus
-          </h2>
-          <p className="text-sm text-muted-foreground">From this week's logs and goals.</p>
-          <ul className="mt-3 flex flex-col gap-2 text-sm">
-            {focus.map((item) => (
-              <li key={item} className="flex gap-2">
-                <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="mb-9 grid gap-4 lg:grid-cols-3">
+        {isCurrent && (
+          <Reveal>
+            <TodayCard />
+          </Reveal>
+        )}
+        <Reveal index={1} className={isCurrent ? 'lg:col-span-2' : 'lg:col-span-3'}>
+          <Panel className="h-full border-primary/30">
+            <h2 className="flex items-center gap-2 font-display text-2xl font-black">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground glow">
+                <Sparkles className="size-5" aria-hidden />
+              </span>
+              Smart focus
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">From this week's logs and goals.</p>
+            <ul className="mt-4 flex flex-col gap-2.5 text-sm">
+              {focus.map((item) => (
+                <li key={item} className="flex gap-2.5 rounded-xl bg-accent/60 p-3">
+                  <span aria-hidden className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_8px_rgb(var(--glow))]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        </Reveal>
       </div>
 
-      <section className="mb-8">
+      <section className="mb-9">
         <SectionHeading title="Weekly snapshot" />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {snapshot.map((tile) => (
-            <StatTile key={tile.label} {...tile} />
+          {snapshot.map((tile, i) => (
+            <Reveal key={tile.label} index={i}>
+              <StatTile
+                label={tile.label}
+                note={tile.note}
+                value={
+                  tile.value === null ? (
+                    '—'
+                  ) : (
+                    <>
+                      <CountUp value={tile.value} format={(n) => formatNumber(n, tile.digits ?? 0)} />
+                      <span className="ml-0.5 text-lg font-bold text-muted-foreground">{tile.unit}</span>
+                    </>
+                  )
+                }
+              />
+            </Reveal>
           ))}
         </div>
       </section>
 
-      <section className="mb-8">
+      <section className="mb-9">
         <SectionHeading title="This week by day" />
         <div className="grid gap-3 lg:grid-cols-2">
           <DailyBarChart
@@ -286,7 +351,7 @@ export function Dashboard() {
 
       <section>
         <SectionHeading title="Report readiness" description="What the weekly report still needs." />
-        <Panel className="grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+        <Panel className="grid gap-x-6 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {readiness.map((item) => {
             const complete = item.done >= item.total
             const Icon = complete ? CircleCheck : CircleDashed
@@ -294,7 +359,7 @@ export function Dashboard() {
               <div key={item.label} className="flex items-center gap-2 text-sm">
                 <Icon className={cn('size-4 shrink-0', complete ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                <span className="text-muted-foreground tabular-nums">
+                <span className="font-semibold text-muted-foreground tabular-nums">
                   {item.done}/{item.total}
                 </span>
               </div>

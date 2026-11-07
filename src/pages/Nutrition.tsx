@@ -107,7 +107,7 @@ function MealCard({
     <Panel>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
-          <h3 className="font-display text-xl font-semibold uppercase">{meal.label}</h3>
+          <h3 className="font-display text-lg font-extrabold">{meal.label}</h3>
           {kcal > 0 && (
             <span className="text-sm text-muted-foreground tabular-nums">
               {formatNumber(round1(kcal))} kcal
@@ -231,8 +231,8 @@ function SupplementGrid({
     })
   }
 
-  const stickyLeft = 'sticky left-0 z-10 bg-card'
-  const stickyRight = 'sticky right-0 z-10 bg-card'
+  const stickyLeft = 'sticky left-0 z-10 bg-card-solid/85 backdrop-blur-md'
+  const stickyRight = 'sticky right-0 z-10 bg-card-solid/85 backdrop-blur-md'
 
   return (
     <section aria-labelledby="supplements-heading" className="mt-8">
@@ -249,7 +249,7 @@ function SupplementGrid({
       <h3 id="supplements-heading" className="sr-only">
         Supplements for {DAY_LONG[day - 1]}
       </h3>
-      <div className="overflow-x-auto rounded-xl border border-border bg-card">
+      <div className="glass overflow-x-auto rounded-2xl">
         <table className="w-full border-separate border-spacing-0 text-sm">
           <caption className="sr-only">
             Supplement doses for {DAY_LONG[day - 1]} by breakfast, lunch and dinner
@@ -302,7 +302,7 @@ function SupplementGrid({
                 <tr key={slot.id}>
                   <th
                     scope="row"
-                    className={`${stickyLeft} ${edge} border-r border-border p-3 text-left font-display text-base font-semibold uppercase`}
+                    className={`${stickyLeft} ${edge} border-r border-border p-3 text-left font-display text-base font-extrabold`}
                   >
                     {slot.label}
                   </th>

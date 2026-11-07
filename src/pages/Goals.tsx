@@ -46,19 +46,19 @@ function GoalCard({ goal, period, periodKey }: { goal: ResolvedGoal; period: Goa
       : undefined
 
   return (
-    <Panel className="flex flex-col gap-4">
+    <Panel className="flex flex-col gap-4" data-goal-card={metric.id}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
             <Icon className="size-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <h3 className="truncate font-semibold">{metric.label}</h3>
+            <h3 className="truncate font-display text-lg font-extrabold">{metric.label}</h3>
             <p className="truncate text-sm text-muted-foreground">{goalValueLine(goal)}</p>
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <div className="font-display text-3xl leading-none font-bold tabular-nums">
+          <div data-goal-pct className="font-display text-3xl leading-none font-black tabular-nums">
             {progress.achievedPct === null ? '—' : `${formatNumber(progress.achievedPct)}%`}
           </div>
           <div className="mt-1 text-xs text-muted-foreground">achieved</div>
@@ -157,7 +157,7 @@ export function GoalsPage() {
         }
       />
 
-      <Panel className="runway mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <Panel className="aurora mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-5">
           {summary ? (
             <ProgressRing value={summary.score} size={104} stroke={9} label={`${label} goal score`} />
@@ -167,7 +167,7 @@ export function GoalsPage() {
               <Button variant="ghost" size="icon-sm" aria-label={`Previous ${noun}`} onClick={() => step(-1)}>
                 <ChevronLeft aria-hidden />
               </Button>
-              <span className="font-display text-2xl font-semibold uppercase" aria-live="polite">
+              <span className="font-display text-2xl font-black" aria-live="polite">
                 {label}
               </span>
               <Button variant="ghost" size="icon-sm" aria-label={`Next ${noun}`} onClick={() => step(1)}>

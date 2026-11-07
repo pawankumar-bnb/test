@@ -1,3 +1,5 @@
+import { motion } from 'motion/react'
+import { useId } from 'react'
 import { cn } from '@/lib/utils'
 
 export function Segmented<T extends string>({
@@ -11,24 +13,33 @@ export function Segmented<T extends string>({
   value: T
   onChange: (value: T) => void
 }) {
+  const id = useId()
   return (
-    <div role="group" aria-label={label} className="inline-flex rounded-lg border border-border bg-card p-0.5">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          aria-pressed={value === option.value}
-          onClick={() => onChange(option.value)}
-          className={cn(
-            'min-h-10 cursor-pointer rounded-md px-4 text-sm font-medium transition-colors duration-150 md:min-h-8',
-            value === option.value
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:text-foreground',
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div role="group" aria-label={label} className="glass inline-flex rounded-xl p-1">
+      {options.map((option) => {
+        const active = value === option.value
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(option.value)}
+            className={cn(
+              'relative min-h-10 cursor-pointer rounded-lg px-4 text-sm font-semibold transition-colors duration-200 md:min-h-8',
+              active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {active && (
+              <motion.span
+                layoutId={`${id}-pill`}
+                className="absolute inset-0 -z-10 rounded-lg bg-brand-gradient glow"
+                transition={{ type: 'spring', stiffness: 450, damping: 34 }}
+              />
+            )}
+            <span className="relative">{option.label}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }

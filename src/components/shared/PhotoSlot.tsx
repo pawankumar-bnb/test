@@ -55,7 +55,7 @@ export function PhotoSlot({
     <div className="flex min-w-0 flex-col gap-2">
       <div
         className={cn(
-          'relative overflow-hidden rounded-xl border bg-background',
+          'relative overflow-hidden rounded-2xl border bg-field backdrop-blur-sm transition-colors duration-200 hover:border-primary/50',
           photo ? 'border-border' : 'border-dashed border-border',
           aspect,
         )}

@@ -1,4 +1,6 @@
 import { Flame, Footprints, Percent, Scale, Utensils, type LucideIcon } from 'lucide-react'
+import { motion } from 'motion/react'
+import { EASE_OUT } from '@/components/motion/motion'
 import type { ResolvedGoal } from '@/lib/goals'
 import { formatNumber, withUnit } from '@/lib/metrics'
 import type { GoalMetricId } from '@/lib/types'
@@ -46,6 +48,7 @@ export function goalValueLine(goal: ResolvedGoal) {
 export function GoalMeter({ goal, className }: { goal: ResolvedGoal; className?: string }) {
   const pct = goal.progress.achievedPct ?? 0
   const warn = goal.metric.limit && goal.progress.overPct > 0
+  const done = !warn && pct >= 100
   return (
     <div
       role="progressbar"
@@ -53,15 +56,20 @@ export function GoalMeter({ goal, className }: { goal: ResolvedGoal; className?:
       aria-valuenow={Math.min(100, pct)}
       aria-valuemin={0}
       aria-valuemax={100}
-      className={cn('h-2 overflow-hidden rounded-full bg-muted', className)}
+      className={cn('h-2.5 overflow-hidden rounded-full bg-muted', className)}
     >
-      <div
+      <motion.div
         className={cn(
-          'h-full rounded-full transition-[width] duration-300',
-          warn ? 'bg-warning' : 'bg-primary',
+          'relative h-full rounded-full',
+          warn ? 'bg-warning' : 'bg-[linear-gradient(90deg,#bef264,var(--primary),var(--primary-2))]',
         )}
-        style={{ width: `${Math.min(100, pct)}%` }}
-      />
+        initial={false}
+        animate={{ width: `${Math.min(100, pct)}%` }}
+        transition={{ duration: 0.7, ease: EASE_OUT }}
+        style={{ boxShadow: warn ? undefined : '0 0 12px rgb(var(--glow) / 0.55)' }}
+      >
+        {done && <span aria-hidden className="shine absolute inset-0 rounded-full" />}
+      </motion.div>
     </div>
   )
 }

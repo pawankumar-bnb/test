@@ -4,11 +4,13 @@ import { toast } from 'sonner'
 import { confirmAction } from '@/components/shared/confirm'
 import { Field } from '@/components/shared/fields'
 import { PageHeader, Panel, SectionHeading } from '@/components/shared/page'
+import { Segmented } from '@/components/shared/Segmented'
 import { Button } from '@/components/ui/button'
 import { applyBackup, backupFileName, createBackupBlob, memberPhotoIds, parseBackup } from '@/lib/backup'
 import { formatDate } from '@/lib/dates'
 import { blankMember } from '@/lib/factory'
 import { storageEstimate } from '@/lib/storage/indexeddb'
+import { type ThemePreference, useTheme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
 import { mutate, storage, useHub, useMember } from '@/store/hub'
 
@@ -32,6 +34,29 @@ function Profile() {
         <Field label="Age" numeric value={member.age} onChange={(v) => set('age', v)} />
         <Field label="Starting weight" numeric unit="kg" value={member.weight} onChange={(v) => set('weight', v)} />
         <Field label="Starting body fat" numeric unit="%" value={member.bf} onChange={(v) => set('bf', v)} />
+      </Panel>
+    </section>
+  )
+}
+
+function Appearance() {
+  const preference = useTheme((s) => s.preference)
+  const setPreference = useTheme((s) => s.setPreference)
+  return (
+    <section className="mt-8">
+      <SectionHeading title="Appearance" description="System follows your phone or computer's light and dark setting." />
+      <Panel className="flex flex-wrap items-center justify-between gap-3">
+        <span className="text-sm font-semibold">Theme</span>
+        <Segmented<ThemePreference>
+          label="Theme"
+          value={preference}
+          onChange={(value) => setPreference(value)}
+          options={[
+            { value: 'system', label: 'System' },
+            { value: 'light', label: 'Light' },
+            { value: 'dark', label: 'Dark' },
+          ]}
+        />
       </Panel>
     </section>
   )
@@ -82,7 +107,7 @@ function Members() {
                 key={member.id}
                 className={cn(
                   'flex items-center justify-between gap-3 rounded-lg border p-3',
-                  active ? 'border-primary/50' : 'border-border',
+                  active ? 'border-primary/50 bg-accent glow' : 'border-border',
                 )}
               >
                 <div className="min-w-0">
@@ -257,6 +282,7 @@ export function SettingsPage() {
     <>
       <PageHeader eyebrow="Settings" title="Profile & data" />
       <Profile />
+      <Appearance />
       <Members />
       <DataPanel />
     </>

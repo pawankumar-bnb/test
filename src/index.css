@@ -1,28 +1,25 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource/barlow/400.css";
-@import "@fontsource/barlow/500.css";
-@import "@fontsource/barlow/600.css";
-@import "@fontsource/barlow/700.css";
-@import "@fontsource/barlow-condensed/500.css";
-@import "@fontsource/barlow-condensed/600.css";
-@import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource-variable/nunito";
+@import "@fontsource-variable/plus-jakarta-sans";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Barlow', ui-sans-serif, system-ui, sans-serif;
-  --font-heading: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Nunito Variable', ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Nunito Variable', ui-rounded, ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-card-solid: var(--card-solid);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-2: var(--primary-2);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -34,36 +31,102 @@
   --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-field: var(--field);
   --color-ring: var(--ring);
+  --color-brand-text: var(--brand-text);
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/*
+ * Two themes from one set of names. Colours come from the Fit Track logo:
+ * leaf green #80cc72 and wordmark green #4f8e55. Every text pairing below was
+ * checked at 4.5:1 or better against the glass surface it sits on.
+ */
 :root {
-  --radius: 0.625rem;
-  --background: #0a0d10;
-  --foreground: #f2f5f7;
-  --card: #11161b;
-  --card-foreground: #f2f5f7;
-  --popover: #171d23;
-  --popover-foreground: #f2f5f7;
-  --primary: #d8ff45;
-  --primary-foreground: #141a00;
-  --secondary: #1b2229;
-  --secondary-foreground: #f2f5f7;
-  --muted: #1f272e;
-  --muted-foreground: #a4afb8;
-  --accent: #1f272e;
-  --accent-foreground: #f2f5f7;
-  --destructive: #ff7d7d;
-  --warning: #ffb86b;
-  --border: #262f37;
-  --input: #303b44;
-  --ring: #d8ff45;
+  --radius: 0.875rem;
+  --background: #e9f4ec;
+  --background-2: #f7fcf8;
+  --foreground: #0f2016;
+  --card: rgb(255 255 255 / 0.58);
+  --card-solid: #f4faf5;
+  --card-foreground: #0f2016;
+  --popover: rgb(250 253 251 / 0.9);
+  --popover-foreground: #0f2016;
+  --primary: #3f7f46;
+  --primary-2: #23795a;
+  --primary-foreground: #ffffff;
+  --glow: 93 187 99;
+  --secondary: rgb(15 32 22 / 0.05);
+  --secondary-foreground: #0f2016;
+  --muted: rgb(15 32 22 / 0.07);
+  --muted-foreground: #4a5f52;
+  --accent: rgb(63 127 70 / 0.1);
+  --accent-foreground: #0f2016;
+  --destructive: #c0392b;
+  --warning: #a14a05;
+  --border: rgb(15 32 22 / 0.1);
+  --input: rgb(15 32 22 / 0.15);
+  --field: rgb(255 255 255 / 0.72);
+  --ring: #3f7f46;
+  --brand-text: #4f8e55;
+  --glass-border: rgb(255 255 255 / 0.85);
+  --glass-highlight: rgb(255 255 255 / 0.9);
+  --glass-shadow: 0 1px 2px rgb(16 40 24 / 0.04), 0 14px 34px -14px rgb(16 40 24 / 0.16);
+  --glass-blur: 18px;
+  --orb-1: #93e3a0;
+  --orb-2: #9cefdc;
+  --orb-3: #d4f59a;
+  --orb-4: #b6f2c9;
+  --orb-opacity: 0.8;
+  --grid-line: rgb(15 32 22 / 0.045);
+  --grain-opacity: 0.05;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #04100a;
+  --background-2: #082015;
+  --foreground: #ecf5ef;
+  --card: rgb(255 255 255 / 0.045);
+  --card-solid: #0b1711;
+  --card-foreground: #ecf5ef;
+  --popover: rgb(12 24 18 / 0.92);
+  --popover-foreground: #ecf5ef;
+  --primary: #86d97a;
+  --primary-2: #34d399;
+  --primary-foreground: #06200c;
+  --glow: 134 217 122;
+  --secondary: rgb(255 255 255 / 0.06);
+  --secondary-foreground: #ecf5ef;
+  --muted: rgb(255 255 255 / 0.07);
+  --muted-foreground: #9fb5a8;
+  --accent: rgb(134 217 122 / 0.12);
+  --accent-foreground: #ecf5ef;
+  --destructive: #ff8a80;
+  --warning: #fbbf24;
+  --border: rgb(255 255 255 / 0.09);
+  --input: rgb(255 255 255 / 0.14);
+  --field: rgb(255 255 255 / 0.04);
+  --ring: #86d97a;
+  --brand-text: #86d97a;
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-highlight: rgb(255 255 255 / 0.07);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 44px -18px rgb(0 0 0 / 0.65);
+  --orb-1: #22c55e;
+  --orb-2: #14b8a6;
+  --orb-3: #65a30d;
+  --orb-4: #059669;
+  --orb-opacity: 0.34;
+  --grid-line: rgb(255 255 255 / 0.03);
+  --grain-opacity: 0.07;
   color-scheme: dark;
 }
 
@@ -81,9 +144,18 @@
     @apply bg-background text-foreground antialiased;
     min-height: 100dvh;
     font-family: var(--font-sans);
-    background-image:
-      radial-gradient(60rem 30rem at 85% -10%, rgb(216 255 69 / 0.06), transparent 70%);
-    background-repeat: no-repeat;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: rgb(var(--glow) / 0.35);
   }
 
   input,
@@ -98,45 +170,288 @@
     }
   }
 
-  input::-webkit-calendar-picker-indicator {
-    filter: invert(0.8);
+  .dark input::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
   }
+}
+
+/* Frosted surface: the base of every card, bar and panel. */
+@utility glass {
+  background-color: var(--card);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+}
+
+/* Denser glass for navigation, which floats over moving content. */
+@utility glass-strong {
+  background-color: color-mix(in oklab, var(--card-solid) 72%, transparent);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(120deg, var(--primary) 10%, var(--primary-2) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-brand-gradient {
+  background-image: linear-gradient(135deg, var(--primary), var(--primary-2));
+}
+
+@utility glow {
+  box-shadow:
+    0 0 0 1px rgb(var(--glow) / 0.25),
+    0 10px 30px -8px rgb(var(--glow) / 0.55);
+}
+
+@utility glow-text {
+  text-shadow: 0 0 24px rgb(var(--glow) / 0.45);
 }
 
 @layer components {
   .eyebrow {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--muted-foreground);
+    color: var(--primary);
   }
 
-  .page-enter {
-    animation: page-enter 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* A soft light that follows the pointer across a card. Position set from AppShell. */
+  .spotlight {
+    position: relative;
+    isolation: isolate;
+    transition:
+      border-color 200ms ease,
+      transform 200ms var(--ease-out-expo),
+      box-shadow 200ms ease;
   }
 
-  /* Report charts render at one fixed size, then scale like an image to fit screen or paper. */
-  .fixed-chart .recharts-wrapper,
-  .fixed-chart .recharts-surface {
-    display: block;
-    width: 100% !important;
-    height: auto !important;
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      380px circle at var(--mx, 50%) var(--my, 50%),
+      rgb(var(--glow) / 0.16),
+      transparent 50%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease;
   }
 
-  /* The lime rule under the hero: the runway the brand line refers to. */
-  .runway {
+  @media (hover: hover) {
+    .spotlight:hover {
+      border-color: rgb(var(--glow) / 0.4);
+    }
+
+    .spotlight:hover::before {
+      opacity: 1;
+    }
+
+    .lift:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 var(--glass-highlight),
+        0 18px 40px -18px rgb(var(--glow) / 0.45);
+    }
+  }
+
+  /* The living background: drifting light, a faint grid and film grain. */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+    background:
+      radial-gradient(1200px 800px at 15% -10%, var(--background-2), transparent 60%),
+      var(--background);
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+    opacity: var(--orb-opacity);
+    will-change: transform;
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+
+  .orb-1 {
+    width: 46vmax;
+    height: 46vmax;
+    left: -12vmax;
+    top: -14vmax;
+    background: radial-gradient(circle at 50% 50%, var(--orb-1), transparent 65%);
+  }
+
+  .orb-2 {
+    width: 40vmax;
+    height: 40vmax;
+    right: -12vmax;
+    top: 8vmax;
+    background: radial-gradient(circle at 50% 50%, var(--orb-2), transparent 65%);
+    animation-duration: 32s;
+    animation-delay: -8s;
+  }
+
+  .orb-3 {
+    width: 34vmax;
+    height: 34vmax;
+    left: 22vmax;
+    bottom: -16vmax;
+    background: radial-gradient(circle at 50% 50%, var(--orb-3), transparent 65%);
+    animation-duration: 38s;
+    animation-delay: -16s;
+  }
+
+  .orb-4 {
+    width: 22vmax;
+    height: 22vmax;
+    right: 18vmax;
+    bottom: 6vmax;
+    background: radial-gradient(circle at 50% 50%, var(--orb-4), transparent 65%);
+    animation-duration: 22s;
+    animation-delay: -4s;
+  }
+
+  .grid-lines {
+    position: absolute;
+    inset: 0;
     background-image:
-      linear-gradient(115deg, transparent 0 62%, rgb(216 255 69 / 0.07) 62% 62.3%, transparent 62.3%),
-      linear-gradient(115deg, transparent 0 74%, rgb(216 255 69 / 0.1) 74% 74.3%, transparent 74.3%),
-      linear-gradient(115deg, transparent 0 86%, rgb(216 255 69 / 0.14) 86% 86.3%, transparent 86.3%);
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
+  }
+
+  .grain {
+    position: absolute;
+    inset: -50%;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Slow-turning light behind the hero. */
+  .aurora {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .aurora::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 70%;
+    aspect-ratio: 1;
+    right: -18%;
+    top: -60%;
+    border-radius: 9999px;
+    background: conic-gradient(
+      from 0deg,
+      rgb(var(--glow) / 0.55),
+      rgb(52 211 153 / 0.35),
+      transparent 40%,
+      rgb(190 242 100 / 0.35),
+      rgb(var(--glow) / 0.55)
+    );
+    filter: blur(60px);
+    opacity: 0.55;
+    animation: spin 22s linear infinite;
+  }
+
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .shine {
+    background-image: linear-gradient(
+      110deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.45) 50%,
+      transparent 70%
+    );
+    background-size: 250% 100%;
+    animation: shine 3.2s ease-in-out infinite;
+  }
+
+  .wordmark {
+    display: block;
+    background-color: var(--brand-text);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: left center;
+    mask-position: left center;
   }
 }
 
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6vmax, 3vmax, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-3vmax, 7vmax, 0) scale(0.94);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: 150% 0;
+  }
+  60%,
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+/* The theme switch reveals the new theme in a circle from the button. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Phones: keep the light still, so scrolling past blurred glass stays smooth. */
+@media (pointer: coarse) {
+  .orb,
+  .aurora::after {
+    animation: none;
+  }
+
+  :root {
+    --glass-blur: 12px;
   }
 }
 
@@ -150,13 +465,31 @@
   }
 }
 
+/* People who ask for less transparency, and browsers without blur, get solid surfaces. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong {
+    background-color: var(--card-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-strong {
+    background-color: var(--card-solid);
+  }
+}
+
 @media print {
   @page {
     margin: 12mm;
   }
 
   /* Without this the dark colour scheme paints the page margins black. */
-  :root {
+  :root,
+  .dark {
     color-scheme: light;
   }
 
@@ -170,7 +503,8 @@
     background: #fff !important;
   }
 
-  .no-print {
+  .no-print,
+  .ambient {
     display: none !important;
   }
 
@@ -192,5 +526,15 @@
   .report-section,
   .chart-frame {
     break-inside: avoid;
+  }
+}
+
+@layer components {
+  /* Report charts render at one fixed size, then scale like an image to fit screen or paper. */
+  .fixed-chart .recharts-wrapper,
+  .fixed-chart .recharts-surface {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
   }
 }

@@ -19,6 +19,13 @@ export const toDateKey = (d: Date) =>
 
 export const todayKey = () => toDateKey(new Date())
 
+export function greeting(now = new Date()) {
+  const hour = now.getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
 export const fromDateKey = (key: string) => {
   const [y, m, d] = key.split('-').map(Number)
   return new Date(y, m - 1, d || 1)

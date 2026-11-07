@@ -120,7 +120,7 @@ export function PhysiquePage() {
         {timeline.length === 0 ? (
           <EmptyState title="No measurements yet" description="Your weekly records will appear here." />
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+          <div className="glass overflow-x-auto rounded-2xl">
             <table className="w-full min-w-[44rem] text-sm">
               <caption className="sr-only">Physique history, newest first</caption>
               <thead>
