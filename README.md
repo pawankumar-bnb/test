@@ -21,16 +21,25 @@ npm run dev
 | `npm run lint` | Lint |
 | `npm run build` | Type-check and build to `dist/` |
 
-## Deploying
+## Live site
 
-Every push to `main` runs the tests, builds, and publishes to GitHub Pages through `.github/workflows/deploy.yml`.
+**https://rafeysupermodel.in**
 
-## Adding a custom domain later
+Every push to `main` runs the tests, builds, and publishes there through `.github/workflows/deploy.yml`, usually within two minutes. The old `pawankumar-bnb.github.io/test/` address redirects to it.
 
-1. In the repository, open **Settings → Pages → Custom domain**, enter the domain and save.
-2. Add the DNS records GitHub shows.
+## Domain setup
 
-No code change is needed: the build uses relative paths and hash routes. One thing to plan for is that browser storage belongs to a web address, so data does not follow automatically to a new domain. Download a backup on the old address and restore it on the new one.
+The domain is registered at GoDaddy and set as the custom domain under **Settings → Pages** in this repository. Its DNS records at GoDaddy:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | `@` | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| CNAME | `www` | `pawankumar-bnb.github.io` |
+
+Changing domain again needs no code change: the build uses relative paths and hash routes. Browser storage belongs to a web address, though, so saved data does not follow to a new domain. Download a backup on the old address and restore it on the new one.
 
 ## Adding login and cloud sync later
 
