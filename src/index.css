@@ -29,6 +29,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-warning: var(--warning);
+  --color-success: var(--success);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-field: var(--field);
@@ -46,85 +47,97 @@
 }
 
 /*
- * Two themes from one set of names. Colours come from the Fit Track logo:
- * leaf green #80cc72 and wordmark green #4f8e55. Every text pairing below was
- * checked at 4.5:1 or better against the glass surface it sits on.
+ * Two themes from one set of names. The brand runs from coral #ef564b to butter #f7ee9f.
+ * Text on that gradient is deep brown: white on coral is only 3.4:1. Success stays green,
+ * matching the logo, because red reads as a warning. Every text pairing was checked at
+ * 4.5:1 or better against the surface it sits on (3:1 for large gradient headings).
  */
 :root {
   --radius: 0.875rem;
-  --background: #e9f4ec;
-  --background-2: #f7fcf8;
-  --foreground: #0f2016;
-  --card: rgb(255 255 255 / 0.58);
-  --card-solid: #f4faf5;
-  --card-foreground: #0f2016;
-  --popover: rgb(250 253 251 / 0.9);
-  --popover-foreground: #0f2016;
-  --primary: #3f7f46;
-  --primary-2: #23795a;
-  --primary-foreground: #ffffff;
-  --glow: 93 187 99;
-  --secondary: rgb(15 32 22 / 0.05);
-  --secondary-foreground: #0f2016;
-  --muted: rgb(15 32 22 / 0.07);
-  --muted-foreground: #4a5f52;
-  --accent: rgb(63 127 70 / 0.1);
-  --accent-foreground: #0f2016;
-  --destructive: #c0392b;
-  --warning: #a14a05;
-  --border: rgb(15 32 22 / 0.1);
-  --input: rgb(15 32 22 / 0.15);
-  --field: rgb(255 255 255 / 0.72);
-  --ring: #3f7f46;
+  --grad-from: #ef564b;
+  --grad-mid: #f3a275;
+  --grad-to: #f7ee9f;
+  --tg-from: #c2392f;
+  --tg-to: #c75c12;
+  --background: #fdf0e6;
+  --background-2: #fffaf3;
+  --foreground: #2a1410;
+  --card: rgb(255 255 255 / 0.6);
+  --card-solid: #fffaf5;
+  --card-foreground: #2a1410;
+  --popover: rgb(255 251 247 / 0.92);
+  --popover-foreground: #2a1410;
+  --primary: #c2392f;
+  --primary-2: #c75c12;
+  --primary-foreground: #2b0d08;
+  --glow: 239 86 75;
+  --secondary: rgb(42 20 16 / 0.05);
+  --secondary-foreground: #2a1410;
+  --muted: rgb(42 20 16 / 0.07);
+  --muted-foreground: #6b4f47;
+  --accent: rgb(239 86 75 / 0.1);
+  --accent-foreground: #2a1410;
+  --success: #2e7d32;
+  --success-glow: 46 125 50;
+  --destructive: #b42318;
+  --warning: #8a4b00;
+  --border: rgb(42 20 16 / 0.1);
+  --input: rgb(42 20 16 / 0.16);
+  --field: rgb(255 255 255 / 0.74);
+  --ring: #c2392f;
   --brand-text: #4f8e55;
   --glass-border: rgb(255 255 255 / 0.85);
   --glass-highlight: rgb(255 255 255 / 0.9);
-  --glass-shadow: 0 1px 2px rgb(16 40 24 / 0.04), 0 14px 34px -14px rgb(16 40 24 / 0.16);
+  --glass-shadow: 0 1px 2px rgb(60 24 16 / 0.05), 0 14px 34px -14px rgb(120 40 20 / 0.18);
   --glass-blur: 18px;
-  --orb-1: #93e3a0;
-  --orb-2: #9cefdc;
-  --orb-3: #d4f59a;
-  --orb-4: #b6f2c9;
-  --orb-opacity: 0.8;
-  --grid-line: rgb(15 32 22 / 0.045);
+  --orb-1: #ffb3a1;
+  --orb-2: #fde68a;
+  --orb-3: #fbc9a0;
+  --orb-4: #fff1b5;
+  --orb-opacity: 0.85;
+  --grid-line: rgb(42 20 16 / 0.045);
   --grain-opacity: 0.05;
   color-scheme: light;
 }
 
 .dark {
-  --background: #04100a;
-  --background-2: #082015;
-  --foreground: #ecf5ef;
-  --card: rgb(255 255 255 / 0.045);
-  --card-solid: #0b1711;
-  --card-foreground: #ecf5ef;
-  --popover: rgb(12 24 18 / 0.92);
-  --popover-foreground: #ecf5ef;
-  --primary: #86d97a;
-  --primary-2: #34d399;
-  --primary-foreground: #06200c;
-  --glow: 134 217 122;
+  --tg-from: #ef564b;
+  --tg-to: #f7ee9f;
+  --background: #140b09;
+  --background-2: #2a130e;
+  --foreground: #fbeee8;
+  --card: rgb(255 255 255 / 0.05);
+  --card-solid: #1c110e;
+  --card-foreground: #fbeee8;
+  --popover: rgb(30 17 14 / 0.94);
+  --popover-foreground: #fbeee8;
+  --primary: #ff8a73;
+  --primary-2: #f7c98a;
+  --primary-foreground: #2b0d08;
+  --glow: 239 86 75;
   --secondary: rgb(255 255 255 / 0.06);
-  --secondary-foreground: #ecf5ef;
+  --secondary-foreground: #fbeee8;
   --muted: rgb(255 255 255 / 0.07);
-  --muted-foreground: #9fb5a8;
-  --accent: rgb(134 217 122 / 0.12);
-  --accent-foreground: #ecf5ef;
+  --muted-foreground: #c9aaa0;
+  --accent: rgb(239 86 75 / 0.14);
+  --accent-foreground: #fbeee8;
+  --success: #6dd58c;
+  --success-glow: 109 213 140;
   --destructive: #ff8a80;
-  --warning: #fbbf24;
+  --warning: #ffb020;
   --border: rgb(255 255 255 / 0.09);
-  --input: rgb(255 255 255 / 0.14);
-  --field: rgb(255 255 255 / 0.04);
-  --ring: #86d97a;
+  --input: rgb(255 255 255 / 0.15);
+  --field: rgb(255 255 255 / 0.045);
+  --ring: #ff8a73;
   --brand-text: #86d97a;
   --glass-border: rgb(255 255 255 / 0.1);
   --glass-highlight: rgb(255 255 255 / 0.07);
-  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 44px -18px rgb(0 0 0 / 0.65);
-  --orb-1: #22c55e;
-  --orb-2: #14b8a6;
-  --orb-3: #65a30d;
-  --orb-4: #059669;
-  --orb-opacity: 0.34;
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 44px -18px rgb(0 0 0 / 0.7);
+  --orb-1: #ef564b;
+  --orb-2: #f59e6b;
+  --orb-3: #c2410c;
+  --orb-4: #f7ee9f;
+  --orb-opacity: 0.3;
   --grid-line: rgb(255 255 255 / 0.03);
   --grain-opacity: 0.07;
   color-scheme: dark;
@@ -194,14 +207,18 @@
 }
 
 @utility text-gradient {
-  background-image: linear-gradient(120deg, var(--primary) 10%, var(--primary-2) 90%);
+  background-image: linear-gradient(120deg, var(--tg-from) 10%, var(--tg-to) 95%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 @utility bg-brand-gradient {
-  background-image: linear-gradient(135deg, var(--primary), var(--primary-2));
+  background-image: linear-gradient(135deg, var(--grad-from), var(--grad-mid) 60%, var(--grad-to));
+}
+
+@utility bg-success-gradient {
+  background-image: linear-gradient(90deg, rgb(var(--success-glow) / 0.85), var(--success));
 }
 
 @utility glow {
@@ -360,11 +377,11 @@
     border-radius: 9999px;
     background: conic-gradient(
       from 0deg,
-      rgb(var(--glow) / 0.55),
-      rgb(52 211 153 / 0.35),
+      rgb(239 86 75 / 0.55),
+      rgb(243 162 117 / 0.45),
       transparent 40%,
-      rgb(190 242 100 / 0.35),
-      rgb(var(--glow) / 0.55)
+      rgb(247 238 159 / 0.45),
+      rgb(239 86 75 / 0.55)
     );
     filter: blur(60px);
     opacity: 0.55;
@@ -384,6 +401,14 @@
     );
     background-size: 250% 100%;
     animation: shine 3.2s ease-in-out infinite;
+  }
+
+  .stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(255 255 255 / 0.28) 0 6px,
+      transparent 6px 12px
+    );
   }
 
   .wordmark {

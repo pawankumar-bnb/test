@@ -27,9 +27,9 @@ export function ProgressRing({
       <svg width={size} height={size} className="relative -rotate-90" aria-hidden>
         <defs>
           <linearGradient id={`${id}-g`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#bef264" />
-            <stop offset="55%" stopColor="var(--primary)" />
-            <stop offset="100%" stopColor="var(--primary-2)" />
+            <stop offset="0%" stopColor="var(--grad-from)" />
+            <stop offset="60%" stopColor="var(--grad-mid)" />
+            <stop offset="100%" stopColor="var(--grad-to)" />
           </linearGradient>
         </defs>
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} className="stroke-muted" />

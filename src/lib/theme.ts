@@ -5,7 +5,7 @@ export type ThemePreference = 'system' | 'light' | 'dark'
 export type ResolvedTheme = 'light' | 'dark'
 
 const KEY = 'fittrack-theme'
-const THEME_COLOR: Record<ResolvedTheme, string> = { light: '#e9f4ec', dark: '#04100a' }
+const THEME_COLOR: Record<ResolvedTheme, string> = { light: '#fdf0e6', dark: '#140b09' }
 
 const media =
   typeof window === 'undefined' ? null : window.matchMedia('(prefers-color-scheme: dark)')

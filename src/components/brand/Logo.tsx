@@ -13,7 +13,7 @@ export function LogoMark({ className }: { className?: string }) {
       width={40}
       height={40}
       draggable={false}
-      className={cn('size-10 shrink-0 rounded-[11px] shadow-[0_6px_18px_-6px_rgb(var(--glow)/0.7)]', className)}
+      className={cn('size-10 shrink-0 rounded-[11px] shadow-[0_6px_18px_-8px_rgb(0_0_0/0.35)]', className)}
     />
   )
 }

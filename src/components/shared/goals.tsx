@@ -30,7 +30,7 @@ export function goalStatus(goal: ResolvedGoal): { text: string; tone: GoalTone }
 
 export const toneClass: Record<GoalTone, string> = {
   muted: 'text-muted-foreground',
-  good: 'text-primary',
+  good: 'text-success',
   warning: 'text-warning',
 }
 
@@ -61,12 +61,16 @@ export function GoalMeter({ goal, className }: { goal: ResolvedGoal; className?:
       <motion.div
         className={cn(
           'relative h-full rounded-full',
-          warn ? 'bg-warning' : 'bg-[linear-gradient(90deg,#bef264,var(--primary),var(--primary-2))]',
+          warn
+            ? 'stripes bg-warning'
+            : done
+              ? 'bg-success-gradient'
+              : 'bg-[linear-gradient(90deg,var(--grad-from),var(--grad-mid),var(--grad-to))]',
         )}
         initial={false}
         animate={{ width: `${Math.min(100, pct)}%` }}
         transition={{ duration: 0.7, ease: EASE_OUT }}
-        style={{ boxShadow: warn ? undefined : '0 0 12px rgb(var(--glow) / 0.55)' }}
+        style={{ boxShadow: warn ? undefined : `0 0 12px rgb(var(${done ? '--success-glow' : '--glow'}) / 0.55)` }}
       >
         {done && <span aria-hidden className="shine absolute inset-0 rounded-full" />}
       </motion.div>

@@ -234,7 +234,7 @@ export function AppShell() {
           e.preventDefault()
           document.getElementById('main')?.focus()
         }}
-        className="no-print sr-only z-50 rounded-md bg-primary px-3 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
+        className="no-print sr-only z-50 rounded-md bg-brand-gradient px-3 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
       >
         Skip to content
       </a>

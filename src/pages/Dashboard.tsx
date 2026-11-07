@@ -63,7 +63,7 @@ function GoalTile({ goal }: { goal: ResolvedGoal }) {
           </span>
           <span className="truncate">{goal.metric.label}</span>
         </span>
-        {reached && <PartyPopper className="float size-4 shrink-0 text-primary" aria-label="Target reached" />}
+        {reached && <PartyPopper className="float size-4 shrink-0 text-success" aria-label="Target reached" />}
       </div>
       <div className="font-display text-3xl leading-none font-black tabular-nums">
         {pct === null ? '—' : <><CountUp value={pct} format={decimal} />%</>}
@@ -357,7 +357,7 @@ export function Dashboard() {
             const Icon = complete ? CircleCheck : CircleDashed
             return (
               <div key={item.label} className="flex items-center gap-2 text-sm">
-                <Icon className={cn('size-4 shrink-0', complete ? 'text-primary' : 'text-muted-foreground')} aria-hidden />
+                <Icon className={cn('size-4 shrink-0', complete ? 'text-success' : 'text-muted-foreground')} aria-hidden />
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
                 <span className="font-semibold text-muted-foreground tabular-nums">
                   {item.done}/{item.total}
