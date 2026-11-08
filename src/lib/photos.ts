@@ -41,7 +41,11 @@ export function usePhotoUrl(id: string | undefined) {
     })
     return () => {
       cancelled = true
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
+      if (!objectUrl) return
+      URL.revokeObjectURL(objectUrl)
+      // Forget it too, or returning to this photo would briefly show the dead URL.
+      const revoked = objectUrl
+      setLoaded((current) => (current?.url === revoked ? null : current))
     }
   }, [id])
 

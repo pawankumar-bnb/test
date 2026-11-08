@@ -5,6 +5,7 @@ import { markUrl, wordmarkUrl } from '@/components/brand/Logo'
 import { PageHeader } from '@/components/shared/page'
 import { Button } from '@/components/ui/button'
 import { DAY_LONG, DAY_SHORT, addDays, fromDateKey, isoWeekNumber, monthKeyOfWeek, monthLabel, toDateKey, weekRangeLabel } from '@/lib/dates'
+import { prChange } from '@/lib/fitness-test'
 import { resolveGoals, type ResolvedGoal } from '@/lib/goals'
 import {
   dayBurn,
@@ -21,7 +22,7 @@ import {
   withUnit,
 } from '@/lib/metrics'
 import { usePhotoUrl } from '@/lib/photos'
-import type { DayIndex, Member, PhotoRef, SupplementColumn, WeekData } from '@/lib/types'
+import type { DayIndex, FitnessTest, Member, PhotoRef, SupplementColumn, WeekData } from '@/lib/types'
 import { BODY_SLOTS, CONTENT_SLOTS, DAY_INDEXES, FACE_SLOTS, INSTAGRAM_FIELDS, SUPPLEMENT_SLOTS, TEST_PHOTO_SLOTS } from '@/lib/types'
 import { mutate, useMember, useSelectedWeek, useWeekData, weekDraft } from '@/store/hub'
 
@@ -88,6 +89,72 @@ function GoalsTable({ title, goals }: { title: string; goals: ResolvedGoal[] }) 
         </tbody>
       </table>
     </div>
+  )
+}
+
+function TestResultsTable({ caption, head, rows }: { caption: string; head: string[]; rows: string[][] }) {
+  return (
+    <div className="mt-3 overflow-x-auto">
+      <table className="w-full border-collapse text-[#101214]">
+        <caption className="mb-1 text-left text-xs font-semibold">{caption}</caption>
+        <thead>
+          <tr>
+            {head.map((h) => (
+              <th key={h} scope="col" className={TH}>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([name, ...cells], i) => (
+            <tr key={i}>
+              <th scope="row" className={`${TD} text-left font-medium`}>
+                {name}
+              </th>
+              {cells.map((cell, j) => (
+                <td key={j} className={TD}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function TestResults({ test }: { test?: FitnessTest }) {
+  const strength = test?.strength.filter((e) => e.name.trim()) ?? []
+  const endurance = test?.endurance.filter((e) => e.name.trim()) ?? []
+  const change = (pr: string, prev: string) => {
+    const c = prChange(pr, prev)
+    return c === null ? '—' : c === 0 ? 'Same' : `${c > 0 ? '+' : '−'}${formatNumber(Math.abs(c))}`
+  }
+  return (
+    <>
+      {strength.length > 0 && (
+        <TestResultsTable
+          caption="Strength test"
+          head={['Exercise', 'Sets × reps', 'Previous PR', 'Current PR', 'Change']}
+          rows={strength.map((e) => [
+            e.name.trim(),
+            e.sets || e.reps ? `${e.sets || '—'} × ${e.reps || '—'}` : '—',
+            e.prevPr || '—',
+            e.pr || '—',
+            change(e.pr, e.prevPr),
+          ])}
+        />
+      )}
+      {endurance.length > 0 && (
+        <TestResultsTable
+          caption="Endurance test"
+          head={['Exercise', 'Time', 'Distance', 'Heart rate']}
+          rows={endurance.map((e) => [e.name.trim(), e.time || '—', e.distance || '—', e.hr ? `${e.hr} bpm` : '—'])}
+        />
+      )}
+    </>
   )
 }
 
@@ -374,10 +441,11 @@ export function ReportPage() {
               ['Rockport time', test?.rockTime || '—'],
               ['VO2max', test?.vo2 || '—'],
               ['YMCA HR', test?.stepHr || '—'],
-              ['Press', test?.press || '—'],
-              ['Squat', test?.squat || '—'],
+              ['Weight / body fat', test ? `${test.weight || '—'} kg / ${test.bf || '—'}%` : '—'],
+              ['Sit & reach', test?.sit || '—'],
             ]}
           />
+          <TestResults test={test} />
         </ReportSection>
 
         <ReportSection title="Fitness test progress photos">

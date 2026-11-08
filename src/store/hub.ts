@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { create } from 'zustand'
 import { weekKeyOf } from '@/lib/dates'
 import { blankDoc, blankFitnessDay, blankNutritionDay, blankWeek } from '@/lib/factory'
+import { upgradeDoc } from '@/lib/fitness-test'
 import type { StorageAdapter } from '@/lib/storage/adapter'
 import { indexedDbAdapter, requestPersistentStorage } from '@/lib/storage/indexeddb'
 import { clearJournal, newestDoc, readJournal, writeJournal } from '@/lib/storage/journal'
@@ -77,8 +78,10 @@ export const useHub = create<HubStore>((set, get) => ({
     try {
       const saved = await storage.loadDoc()
       const doc = newestDoc(saved, readJournal())
+      const upgraded = doc ? upgradeDoc(doc) : false
       if (doc) set({ doc })
-      if (doc !== saved) await storage.saveDoc(get().doc)
+      // Saved straight back when it came from the journal or needed upgrading.
+      if (doc !== saved || upgraded) await storage.saveDoc(get().doc)
       clearJournal()
       set({ status: 'ready' })
     } catch (error) {
@@ -111,7 +114,9 @@ export const useHub = create<HubStore>((set, get) => ({
 channel?.addEventListener('message', async () => {
   if (dirty) return
   const doc = await storage.loadDoc()
-  if (doc && !dirty) useHub.setState({ doc })
+  if (!doc || dirty) return
+  upgradeDoc(doc)
+  useHub.setState({ doc })
 })
 
 // A closing or backgrounded tab must not lose the last keystrokes.

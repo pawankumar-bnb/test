@@ -1,4 +1,5 @@
 import { legacyWeekToKey } from './dates'
+import { upgradeMember } from './fitness-test'
 import {
   blankCardio,
   blankExercise,
@@ -158,6 +159,7 @@ function migrateWeek(raw: Loose, photos: Photos): WeekData {
   return week
 }
 
+/** Keeps the old fixed fields as they were; upgradeMember turns them into entries after de-duplication. */
 function migrateTest(raw: Loose, photos: Photos): FitnessTest {
   const test: FitnessTest = {
     id: newId(),
@@ -165,9 +167,12 @@ function migrateTest(raw: Loose, photos: Photos): FitnessTest {
     weight: str(raw.weight),
     bf: str(raw.bf),
     photos: {},
+    strength: [],
+    endurance: [],
   }
+  const fields = test as unknown as Record<string, string>
   for (const key of TEST_FIELD_KEYS) {
-    if (str(raw[key])) test[key] = str(raw[key])
+    if (str(raw[key])) fields[key] = str(raw[key])
   }
   for (const { id } of TEST_PHOTO_SLOTS) {
     const photo = raw.photos?.[id]
@@ -208,8 +213,9 @@ function migrateMember(id: string, raw: Loose, reference: Date, photos: Photos):
   const tests = new Map<string, FitnessTest>()
   const remember = (rawTest: Loose) => {
     const test = migrateTest(rawTest, photos)
+    const fields = test as unknown as Record<string, string | undefined>
     const hasContent =
-      test.date || TEST_FIELD_KEYS.some((key) => test[key]) || Object.keys(test.photos).length
+      test.date || TEST_FIELD_KEYS.some((key) => fields[key]) || Object.keys(test.photos).length
     if (!hasContent) return
     const signature = testSignature(test)
     const existing = tests.get(signature)
@@ -223,6 +229,7 @@ function migrateMember(id: string, raw: Loose, reference: Date, photos: Photos):
     if (week.fitnessTest && Object.keys(week.fitnessTest).length) remember(week.fitnessTest)
   }
   member.fitnessTests = [...tests.values()].sort((a, b) => b.date.localeCompare(a.date))
+  upgradeMember(member)
 
   return member
 }

@@ -216,14 +216,6 @@ export const FITNESS_TEST_SECTIONS = [
     ],
   },
   {
-    title: 'Muscular endurance',
-    fields: [
-      { key: 'press', label: 'Push-ups / DB press / barbell press' },
-      { key: 'squat', label: 'Weighted / bodyweight squats' },
-      { key: 'lat', label: 'Lat-pulldown / TRX pull-ups' },
-    ],
-  },
-  {
     title: 'Flexibility',
     fields: [
       { key: 'quad', label: 'Quadriceps' },
@@ -238,12 +230,41 @@ export const FITNESS_TEST_SECTIONS = [
 export type FitnessTestKey =
   (typeof FITNESS_TEST_SECTIONS)[number]['fields'][number]['key']
 
+/** One exercise of a test's strength section. */
+export interface StrengthEntry {
+  id: string
+  name: string
+  sets: string
+  reps: string
+  /** This test's best. */
+  pr: string
+  /**
+   * The best from before this test. Filled from earlier tests and then locked, so a
+   * later edit or deletion elsewhere cannot change it. Typed by hand only when no
+   * earlier record exists.
+   */
+  prevPr: string
+  /** Date of the test prevPr was taken from. Empty when it was typed by hand. */
+  prevFrom: string
+}
+
+/** One exercise of a test's endurance section. */
+export interface EnduranceEntry {
+  id: string
+  name: string
+  time: string
+  distance: string
+  hr: string
+}
+
 export type FitnessTest = {
   id: string
   date: string
   weight: string
   bf: string
   photos: Partial<Record<TestPhotoSlot, PhotoRef>>
+  strength: StrengthEntry[]
+  endurance: EnduranceEntry[]
 } & Partial<Record<FitnessTestKey, string>>
 
 export type GoalMetricId = 'steps' | 'burn' | 'intake' | 'weight' | 'bf'

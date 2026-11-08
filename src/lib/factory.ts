@@ -63,12 +63,18 @@ export const blankWeek = (): WeekData => ({
   finalizedAt: null,
 })
 
-export const blankFitnessTest = (date: string, weight: string, bf: string): FitnessTest => ({
+export const blankFitnessTest = (
+  date: string,
+  weight: string,
+  bf: string,
+  sections: Pick<FitnessTest, 'strength' | 'endurance'> = { strength: [], endurance: [] },
+): FitnessTest => ({
   id: newId(),
   date,
   weight,
   bf,
   photos: {},
+  ...sections,
 })
 
 export const STARTER_SUPPLEMENT_COLUMNS = 3

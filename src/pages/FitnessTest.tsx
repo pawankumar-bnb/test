@@ -1,5 +1,8 @@
 import { Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
+import { toast } from 'sonner'
+import { EnduranceHistory, StrengthHistory } from '@/components/fitness-test/history'
+import { EnduranceTest, StrengthTest } from '@/components/fitness-test/sections'
 import { confirmAction } from '@/components/shared/confirm'
 import { Field } from '@/components/shared/fields'
 import { EmptyState, PageHeader, Panel, SectionHeading } from '@/components/shared/page'
@@ -7,9 +10,10 @@ import { PhotoSlot } from '@/components/shared/PhotoSlot'
 import { Button } from '@/components/ui/button'
 import { formatDate, fromDateKey, todayKey } from '@/lib/dates'
 import { blankFitnessTest } from '@/lib/factory'
+import { carryForward, redateTest } from '@/lib/fitness-test'
 import { valueAsOf } from '@/lib/metrics'
 import { deletePhoto } from '@/lib/photos'
-import type { FitnessTest, FitnessTestKey, PhotoRef } from '@/lib/types'
+import type { FitnessTest, FitnessTestKey, Member, PhotoRef } from '@/lib/types'
 import { FITNESS_TEST_SECTIONS, TEST_PHOTO_SLOTS } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { mutate, useMember, useSelectedWeek } from '@/store/hub'
@@ -23,9 +27,11 @@ function History({ tests, activeId, onSelect }: { tests: FitnessTest[]; activeId
     { label: 'Weight / body fat', value: (t) => `${t.weight || '—'} kg / ${t.bf || '—'}%` },
     { label: 'Rockport', value: (t) => t.rockTime || '—' },
     { label: 'VO2max', value: (t) => t.vo2 || '—' },
-    { label: 'Press', value: (t) => t.press || '—' },
-    { label: 'Squat', value: (t) => t.squat || '—' },
-    { label: 'Lat', value: (t) => t.lat || '—' },
+    { label: 'Strength PRs', value: (t) => String(t.strength.filter((e) => e.pr.trim()).length || '—') },
+    {
+      label: 'Endurance',
+      value: (t) => String(t.endurance.filter((e) => e.time.trim() || e.distance.trim() || e.hr.trim()).length || '—'),
+    },
   ]
   return (
     <div className="glass overflow-x-auto rounded-2xl">
@@ -76,27 +82,38 @@ export function FitnessTestPage() {
   const [selectedId, setSelectedId] = useState<string | undefined>(tests[0]?.id)
   const test = tests.find((t) => t.id === selectedId) ?? tests[0]
 
-  const edit = (recipe: (draft: FitnessTest) => void) =>
+  const edit = (recipe: (draft: FitnessTest, member: Member) => void) =>
     mutate((m) => {
       const draft = m.fitnessTests.find((t) => t.id === test?.id)
-      if (draft) recipe(draft)
+      if (draft) recipe(draft, m)
     })
 
   function addTest() {
+    const date = todayKey()
+    const sections = carryForward(tests, date)
     const created = blankFitnessTest(
-      todayKey(),
+      date,
       String(valueAsOf(member, 'weight', week) ?? ''),
       String(valueAsOf(member, 'bf', week) ?? ''),
+      sections,
     )
     mutate((m) => void m.fitnessTests.unshift(created))
     setSelectedId(created.id)
+    const carried = sections.strength.length + sections.endurance.length
+    if (carried) {
+      const prs = sections.strength.filter((e) => e.prevPr).length
+      toast.success(
+        `Brought over ${carried} exercise${carried === 1 ? '' : 's'} from your last test` +
+          (prs ? `, with ${prs} Previous PR${prs === 1 ? '' : 's'} locked in.` : '.'),
+      )
+    }
   }
 
   async function removeTest() {
     if (!test) return
     const ok = await confirmAction({
       title: 'Delete this fitness test?',
-      description: `The record from ${dateLabel(test.date)} and its photos will be removed. This cannot be undone.`,
+      description: `The record from ${dateLabel(test.date)}, with its strength and endurance results and photos, will be removed. Later tests keep the Previous PRs they already carried over. This cannot be undone.`,
       confirmLabel: 'Delete test',
     })
     if (!ok) return
@@ -135,7 +152,7 @@ export function FitnessTestPage() {
               label="Test date"
               type="date"
               value={test.date}
-              onChange={(v) => edit((t) => void (t.date = v))}
+              onChange={(v) => edit((t, m) => redateTest(m.fitnessTests, t, v))}
               className="w-full sm:w-56"
             />
             <Button variant="ghost" onClick={removeTest}>
@@ -145,21 +162,30 @@ export function FitnessTestPage() {
           </Panel>
 
           {FITNESS_TEST_SECTIONS.map((section) => (
-            <section key={section.title} className="mt-6">
-              <SectionHeading title={section.title} />
-              <Panel className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                {section.fields.map((field) => (
-                  <Field
-                    key={field.key}
-                    label={field.label}
-                    numeric={'numeric' in field}
-                    placeholder={'placeholder' in field ? field.placeholder : undefined}
-                    value={test[field.key as FitnessTestKey] ?? ''}
-                    onChange={(v) => edit((t) => void (t[field.key as FitnessTestKey] = v))}
-                  />
-                ))}
-              </Panel>
-            </section>
+            <Fragment key={section.title}>
+              <section className="mt-6">
+                <SectionHeading title={section.title} />
+                <Panel className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                  {section.fields.map((field) => (
+                    <Field
+                      key={field.key}
+                      label={field.label}
+                      numeric={'numeric' in field}
+                      placeholder={'placeholder' in field ? field.placeholder : undefined}
+                      value={test[field.key as FitnessTestKey] ?? ''}
+                      onChange={(v) => edit((t) => void (t[field.key as FitnessTestKey] = v))}
+                    />
+                  ))}
+                </Panel>
+              </section>
+              {/* Muscular endurance sits where it did on the assessment sheet, now in two parts. */}
+              {section.title === 'YMCA step-up test' && (
+                <>
+                  <StrengthTest test={test} tests={tests} />
+                  <EnduranceTest test={test} tests={tests} />
+                </>
+              )}
+            </Fragment>
           ))}
 
           <section className="mt-6">
@@ -188,6 +214,9 @@ export function FitnessTestPage() {
             <SectionHeading title="History" description="Select a date to open that record." />
             <History tests={tests} activeId={test.id} onSelect={setSelectedId} />
           </section>
+
+          <StrengthHistory tests={tests} activeId={test.id} onSelect={setSelectedId} />
+          <EnduranceHistory tests={tests} activeId={test.id} onSelect={setSelectedId} />
         </>
       )}
     </>

@@ -1,3 +1,4 @@
+import { upgradeDoc } from './fitness-test'
 import { LEGACY_STORAGE_KEY, migrateV14 } from './migrate-v14'
 import type { StorageAdapter } from './storage/adapter'
 import type { ContentSlot, HubDoc, Member, PhotoRef } from './types'
@@ -103,6 +104,7 @@ export function parseBackup(text: string): ParsedBackup {
 
   if (isDoc(payload?.doc)) {
     const photos = Array.isArray(payload.photos) ? (payload.photos as BackupPhoto[]) : []
+    upgradeDoc(payload.doc)
     return { doc: payload.doc, photos, source: 'v15', exportedAt: validDate }
   }
 

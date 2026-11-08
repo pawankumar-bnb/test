@@ -17,7 +17,7 @@ npm run dev
 
 | Command | What it does |
 | --- | --- |
-| `npm test` | Unit tests for goals, dates, backups and the v14 import |
+| `npm test` | Unit tests for goals, dates, backups, the v14 import and fitness test PRs |
 | `npm run lint` | Lint |
 | `npm run build` | Type-check and build to `dist/` |
 

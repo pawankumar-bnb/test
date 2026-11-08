@@ -58,6 +58,7 @@ const legacyDb = {
             date: '2026-11-03',
             rhr: '58',
             vo2: '48',
+            press: '38',
             weight: '74',
             bf: '13.5',
             photos: { ftFront: { src: PIXEL, name: 'front.png', type: 'image/png', size: 70 } },
@@ -79,6 +80,7 @@ const legacyDb = {
           date: '2026-11-03',
           rhr: '58',
           vo2: '48',
+          press: '38',
           weight: '74',
           bf: '13.5',
           photos: { ftFront: { src: PIXEL, name: 'front.png', type: 'image/png', size: 70 } },
@@ -132,6 +134,12 @@ describe('v14 migration', () => {
     expect(member.fitnessTests).toHaveLength(1)
     expect(member.fitnessTests[0]).toMatchObject({ date: '2026-11-03', vo2: '48' })
     expect(member.fitnessTests[0].photos.ftFront?.name).toBe('front.png')
+  })
+
+  it('turns the old muscular endurance boxes into strength entries', () => {
+    expect(member.fitnessTests[0]).not.toHaveProperty('press')
+    expect(member.fitnessTests[0].strength).toMatchObject([{ name: 'Push-ups / DB press / barbell press', pr: '38' }])
+    expect(member.fitnessTests[0].endurance).toEqual([])
   })
 
   it('stores an image used in several places once', () => {
