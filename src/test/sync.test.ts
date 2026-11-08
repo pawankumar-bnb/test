@@ -141,9 +141,10 @@ describe('two devices', () => {
   it('the server only ever holds encrypted data', async () => {
     const { srv, code } = await pair()
     const records = srv.vaults.dump(await vaultId(code))
-    const text = JSON.stringify(records)
+    const data = records.map((r) => r.data ?? '').join('\n')
     expect(records.length).toBeGreaterThan(0)
-    for (const secret of ['Oats', 'Creatine', '5 g', 'front.jpg', '48']) expect(text).not.toContain(secret)
+    // Only the stored values, and only readable fragments: random ciphertext can contain short digit runs.
+    for (const secret of ['Oats', 'Creatine', '"5 g"', 'front.jpg', '"vo2"', '"name"', 'Rafey']) expect(data).not.toContain(secret)
   })
 
   it('edits on one device reach the other', async () => {

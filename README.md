@@ -52,7 +52,7 @@ Changing domain again needs no code change: the build uses relative paths and ha
 
 ## The sync service
 
-`worker/` is a Cloudflare Worker: D1 holds the encrypted records, and R2 holds the encrypted photos (or KV, if R2 is not enabled on the account). It accepts at most `MAX_VAULTS` sync codes, so strangers cannot use it as free storage.
+`worker/` is a Cloudflare Worker on the Fit Track Cloudflare account: D1 holds the encrypted records and KV the encrypted photos (1 GB free; binding an R2 bucket as `PHOTOS` would switch photos to R2). It accepts at most `MAX_VAULTS` sync codes, so strangers cannot use it as free storage.
 
 ```bash
 cd worker

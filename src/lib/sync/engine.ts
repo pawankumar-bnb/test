@@ -345,7 +345,13 @@ export class SyncEngine {
     if (!pending) {
       pending = (async () => {
         try {
-          const bytes = await api.getPhoto(id)
+          let bytes = await api.getPhoto(id)
+          // A photo uploaded seconds ago may not have reached every Cloudflare location yet.
+          for (const wait of [3000, 10000]) {
+            if (bytes) break
+            await new Promise((resolve) => setTimeout(resolve, wait))
+            bytes = await api.getPhoto(id)
+          }
           if (!bytes) return undefined
           const blob = await openPhoto(keys.key, bytes)
           await this.options.local.putPhoto(id, blob)

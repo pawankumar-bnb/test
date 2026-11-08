@@ -1,3 +1,5 @@
 node_modules
 .wrangler
 .dev.vars
+# The Cloudflare API token used to deploy. Never commit it.
+.env

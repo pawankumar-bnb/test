@@ -1,6 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fittrack-sync",
+  // The Fit Track Cloudflare account. Pinned so a deploy can never land in another one.
+  "account_id": "fa97e9e409d70f17d03e72323d957355",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-01",
   "observability": { "enabled": true },
@@ -8,12 +10,12 @@
     {
       "binding": "DB",
       "database_name": "fittrack-sync",
-      // Filled in by `wrangler d1 create` when the account is connected.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "7b8c79fb-b75a-4b4f-92f8-b75aaf773e5c",
       "migrations_dir": "migrations"
     }
   ],
-  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "fittrack-photos" }],
+  // Photos live in KV (free, no card, 1 GB). To move to R2 later, bind an R2 bucket as PHOTOS.
+  "kv_namespaces": [{ "binding": "PHOTOS_KV", "id": "d144f3701e7343d6a5004d32fd4398b6" }],
   "vars": {
     "ALLOWED_ORIGINS": "https://rafeysupermodel.in,https://www.rafeysupermodel.in,http://localhost:5199,http://127.0.0.1:5199,http://127.0.0.1:5196",
     "MAX_VAULTS": "3"
