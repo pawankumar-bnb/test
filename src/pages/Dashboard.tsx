@@ -1,4 +1,4 @@
-import { ArrowRight, CircleCheck, CircleDashed, Dumbbell, PartyPopper, Sparkles, Target, Utensils } from 'lucide-react'
+import { ArrowRight, CircleCheck, CircleDashed, Cloud, Dumbbell, KeyRound, PartyPopper, Sparkles, Target, Utensils, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { LogoMark } from '@/components/brand/Logo'
@@ -39,6 +39,7 @@ import {
   weekMacros,
   weekSteps,
 } from '@/lib/metrics'
+import { useSync } from '@/lib/sync/runtime'
 import type { GoalPeriod } from '@/lib/types'
 import { DAY_INDEXES } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -77,24 +78,66 @@ function GoalTile({ goal }: { goal: ResolvedGoal }) {
   )
 }
 
-function WelcomeCard() {
+function WelcomeCard({ canSync }: { canSync: boolean }) {
   const dismiss = () => mutate((_, doc) => void (doc.importPromptDismissed = true))
   return (
     <Panel className="mb-5 flex flex-col gap-3 border-primary/40 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="font-display text-lg font-extrabold">Have data in the old tracker file?</h2>
+        <h2 className="font-display text-lg font-extrabold">
+          {canSync ? 'Already using Fit Track on another device?' : 'Have data in the old tracker file?'}
+        </h2>
         <p className="text-sm text-muted-foreground">
-          Press Backup Data in the old file, then restore that backup here. Everything comes across, photos included.
+          {canSync
+            ? 'Enter your sync code in Settings to bring everything here. Coming from the old tracker file? Restore its backup there instead.'
+            : 'Press Backup Data in the old file, then restore that backup here. Everything comes across, photos included.'}
         </p>
       </div>
-      <div className="flex shrink-0 gap-2">
+      <div className="flex shrink-0 flex-wrap gap-2">
         <Link to="/settings" className={buttonVariants()}>
-          Restore backup
+          {canSync && <KeyRound aria-hidden />}
+          {canSync ? 'Enter sync code' : 'Restore backup'}
         </Link>
         <Button variant="ghost" onClick={dismiss}>
           Start fresh
         </Button>
       </div>
+    </Panel>
+  )
+}
+
+const NUDGE_KEY = 'fittrack-sync-nudge-dismissed'
+
+/** Data that lives on one device only is one lost phone away from gone. */
+function SyncNudge() {
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return localStorage.getItem(NUDGE_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+  if (hidden) return null
+  const hide = () => {
+    try {
+      localStorage.setItem(NUDGE_KEY, '1')
+    } catch {
+      /* private mode: hides for this visit only */
+    }
+    setHidden(true)
+  }
+  return (
+    <Panel className="mb-5 flex items-center gap-3 py-3 md:py-3">
+      <Cloud className="size-5 shrink-0 text-primary" aria-hidden />
+      <p className="min-w-0 flex-1 text-sm">
+        <span className="font-semibold">Your data is only on this device.</span>{' '}
+        <span className="text-muted-foreground">Turn on sync to see it on your phone and laptop too.</span>
+      </p>
+      <Link to="/settings" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+        Set up sync
+      </Link>
+      <Button variant="ghost" size="icon-sm" aria-label="Dismiss" onClick={hide}>
+        <X aria-hidden />
+      </Button>
     </Panel>
   )
 }
@@ -154,6 +197,8 @@ export function Dashboard() {
     (s) => !s.doc.importPromptDismissed && Object.keys(s.doc.members[s.doc.activeId].weeks).length === 0,
   )
   const [period, setPeriod] = useState<GoalPeriod>('weekly')
+  const syncAvailable = useSync((s) => s.available)
+  const syncOff = useSync((s) => s.code === null)
 
   const isCurrent = week === weekKeyOf()
   const month = monthKeyOfWeek(week)
@@ -196,7 +241,11 @@ export function Dashboard() {
 
   return (
     <>
-      {showWelcome && <WelcomeCard />}
+      {showWelcome ? (
+        <WelcomeCard canSync={syncAvailable && syncOff} />
+      ) : (
+        syncAvailable && syncOff && <SyncNudge />
+      )}
 
       <section className="glass aurora relative mb-8 flex flex-col gap-8 rounded-3xl p-6 md:flex-row md:items-center md:justify-between md:p-9">
         <div className="min-w-0">

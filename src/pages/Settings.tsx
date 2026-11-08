@@ -4,13 +4,16 @@ import { toast } from 'sonner'
 import { confirmAction } from '@/components/shared/confirm'
 import { Field } from '@/components/shared/fields'
 import { PageHeader, Panel, SectionHeading } from '@/components/shared/page'
+import { SyncPanel } from '@/components/sync/SyncPanel'
 import { Segmented } from '@/components/shared/Segmented'
 import { Button } from '@/components/ui/button'
-import { applyBackup, backupFileName, createBackupBlob, memberPhotoIds, parseBackup } from '@/lib/backup'
+import { applyBackup, memberPhotoIds, parseBackup } from '@/lib/backup'
 import { formatDate } from '@/lib/dates'
+import { downloadBackup } from '@/lib/download-backup'
 import { blankMember } from '@/lib/factory'
 import { storageEstimate } from '@/lib/storage/indexeddb'
 import { type ThemePreference, useTheme } from '@/lib/theme'
+import { useSync } from '@/lib/sync/runtime'
 import { cn } from '@/lib/utils'
 import { mutate, storage, useHub, useMember } from '@/store/hub'
 
@@ -161,6 +164,7 @@ function DataPanel() {
   const doc = useHub((s) => s.doc)
   const persistent = useHub((s) => s.persistent)
   const replaceDoc = useHub((s) => s.replaceDoc)
+  const synced = useSync((s) => s.code !== null)
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<'backup' | 'restore' | null>(null)
   const [usage, setUsage] = useState<number | null>(null)
@@ -172,13 +176,7 @@ function DataPanel() {
   async function download() {
     setBusy('backup')
     try {
-      const { blob, missing } = await createBackupBlob(doc, storage)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = backupFileName()
-      link.click()
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
+      const missing = await downloadBackup(doc, storage)
       mutate((_, draft) => void (draft.lastBackupAt = new Date().toISOString()))
       if (missing) toast.warning(`Backup created, but ${missing} photo(s) could not be found.`)
       else toast.success('Backup downloaded. Keep the file somewhere safe.')
@@ -198,7 +196,7 @@ function DataPanel() {
       const names = Object.values(parsed.doc.members).map((m) => m.name).join(', ')
       const ok = await confirmAction({
         title: 'Replace everything with this backup?',
-        description: `This loads ${names} from ${parsed.source === 'v14' ? 'the old tracker' : 'a hub backup'}${parsed.exportedAt ? ` made on ${formatDate(parsed.exportedAt)}` : ''}, along with ${parsed.photos.length} photo(s). What is on this device now will be replaced.`,
+        description: `This loads ${names} from ${parsed.source === 'v14' ? 'the old tracker' : 'a hub backup'}${parsed.exportedAt ? ` made on ${formatDate(parsed.exportedAt)}` : ''}, along with ${parsed.photos.length} photo(s). ${synced ? 'Your data on every synced device will be replaced.' : 'What is on this device now will be replaced.'}`,
         confirmLabel: 'Replace my data',
       })
       if (!ok) return
@@ -220,9 +218,9 @@ function DataPanel() {
         <div className="flex gap-3 text-sm">
           <ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
           <p className="text-muted-foreground">
-            Everything saves automatically in this browser on this device. It is never uploaded, so
-            nobody else who opens the link can see it, and it does not sync to your other devices.
-            Use a backup to move data or keep it safe.
+            {synced
+              ? 'Everything saves on this device first, then syncs to your other devices, encrypted with your sync code. A backup file is still a good extra copy.'
+              : 'Everything saves automatically in this browser on this device, and nobody else who opens the link can see it. It stays on this device only, unless you turn on sync above.'}
           </p>
         </div>
 
@@ -281,6 +279,7 @@ export function SettingsPage() {
   return (
     <>
       <PageHeader eyebrow="Settings" title="Profile & data" />
+      <SyncPanel />
       <Profile />
       <Appearance />
       <Members />

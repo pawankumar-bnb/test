@@ -1,6 +1,6 @@
 import { type IDBPDatabase, openDB } from 'idb'
 import type { HubDoc } from '../types'
-import type { StorageAdapter } from './adapter'
+import type { KeyValueStore, StorageAdapter } from './adapter'
 
 const DB_NAME = 'rafey-performance-hub'
 const DOC_KEY = 'doc'
@@ -17,7 +17,7 @@ function db() {
   return connection
 }
 
-export const indexedDbAdapter: StorageAdapter = {
+export const indexedDbAdapter: StorageAdapter & KeyValueStore = {
   async loadDoc() {
     return (await db()).get('kv', DOC_KEY) as Promise<HubDoc | undefined>
   },
@@ -35,6 +35,14 @@ export const indexedDbAdapter: StorageAdapter = {
   },
   async listPhotoIds() {
     return (await (await db()).getAllKeys('photos')) as string[]
+  },
+  async getValue<T>(key: string) {
+    return (await (await db()).get('kv', key)) as T | undefined
+  },
+  async setValue(key, value) {
+    const database = await db()
+    if (value === undefined) await database.delete('kv', key)
+    else await database.put('kv', value, key)
   },
 }
 

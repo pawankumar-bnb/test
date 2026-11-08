@@ -1,7 +1,8 @@
-import { CalendarCheck, Check, ChevronLeft, ChevronRight, CircleAlert, LoaderCircle, Menu } from 'lucide-react'
+import { CalendarCheck, Check, ChevronLeft, ChevronRight, CircleAlert, CloudAlert, CloudCheck, CloudOff, LoaderCircle, Menu } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
+import { toast } from 'sonner'
 import { Ambient } from '@/components/brand/Ambient'
 import { LogoMark, Wordmark } from '@/components/brand/Logo'
 import { ThemeToggle } from '@/components/brand/ThemeToggle'
@@ -9,6 +10,7 @@ import { EASE_OUT } from '@/components/motion/motion'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { isoWeekNumber, shiftWeek, weekKeyOf, weekRangeLabel } from '@/lib/dates'
+import { SYNC_TOAST_KEY, useSync } from '@/lib/sync/runtime'
 import { cn } from '@/lib/utils'
 import { useHub, useMember, useSelectedWeek } from '@/store/hub'
 import { NAV_ITEMS, PRIMARY_MOBILE, SECONDARY_MOBILE } from './nav'
@@ -30,25 +32,38 @@ function Brand({ compact }: { compact?: boolean }) {
   )
 }
 
+/** Saving on this device comes first; once that is done, the sync state shows. */
 function SaveStatus() {
   const saveState = useHub((s) => s.saveState)
-  const content = {
-    saved: { icon: <Check className="size-3.5" aria-hidden />, text: 'Saved' },
-    saving: { icon: <LoaderCircle className="size-3.5 animate-spin" aria-hidden />, text: 'Saving' },
-    error: { icon: <CircleAlert className="size-3.5" aria-hidden />, text: 'Not saved' },
-  }[saveState]
+  const sync = useSync((s) => s.status)
+  const spinner = <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
+  const content =
+    saveState !== 'saved'
+      ? {
+          saving: { icon: spinner, text: 'Saving', tone: '', hint: 'Saving on this device' },
+          error: { icon: <CircleAlert className="size-3.5" aria-hidden />, text: 'Not saved', tone: 'text-destructive', hint: 'Could not save on this device' },
+        }[saveState]
+      : {
+          off: { icon: <Check className="size-3.5" aria-hidden />, text: 'Saved', tone: 'text-primary', hint: 'Saved on this device' },
+          syncing: { icon: spinner, text: 'Syncing', tone: 'text-primary', hint: 'Saved here, syncing to your other devices' },
+          synced: { icon: <CloudCheck className="size-3.5" aria-hidden />, text: 'Synced', tone: 'text-success', hint: 'Saved and synced to your other devices' },
+          offline: { icon: <CloudOff className="size-3.5" aria-hidden />, text: 'Offline', tone: 'text-warning', hint: "Saved on this device. It syncs when you're back online" },
+          error: { icon: <CloudAlert className="size-3.5" aria-hidden />, text: 'Sync issue', tone: 'text-destructive', hint: 'Saved on this device, but sync had a problem. See Settings' },
+        }[sync]
   return (
-    <span
+    <Link
+      to="/settings"
       role="status"
+      title={content.hint}
+      aria-label={content.hint}
       className={cn(
-        'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-muted-foreground',
-        saveState === 'saved' && 'text-primary',
-        saveState === 'error' && 'text-destructive',
+        'inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent',
+        content.tone,
       )}
     >
       {content.icon}
       <span className="hidden sm:inline">{content.text}</span>
-    </span>
+    </Link>
   )
 }
 
@@ -240,6 +255,14 @@ export function AppShell() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
+
+  // Linking a device reloads every tab; say what happened once the page is back.
+  useEffect(() => {
+    const message = sessionStorage.getItem(SYNC_TOAST_KEY)
+    if (!message) return
+    sessionStorage.removeItem(SYNC_TOAST_KEY)
+    toast.success(message)
+  }, [])
 
   return (
     <div className="print-reset relative flex min-h-dvh">

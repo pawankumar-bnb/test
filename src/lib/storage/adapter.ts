@@ -13,3 +13,9 @@ export interface StorageAdapter {
   deletePhoto(id: string): Promise<void>
   listPhotoIds(): Promise<string[]>
 }
+
+/** Small values this device keeps for itself, such as its sync settings. */
+export interface KeyValueStore {
+  getValue<T>(key: string): Promise<T | undefined>
+  setValue(key: string, value: unknown): Promise<void>
+}

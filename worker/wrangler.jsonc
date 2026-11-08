@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fittrack-sync",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fittrack-sync",
+      // Filled in by `wrangler d1 create` when the account is connected.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "fittrack-photos" }],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://rafeysupermodel.in,https://www.rafeysupermodel.in,http://localhost:5199,http://127.0.0.1:5199,http://127.0.0.1:5196",
+    "MAX_VAULTS": "3"
+  }
+}

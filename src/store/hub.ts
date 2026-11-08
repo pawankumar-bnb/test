@@ -5,11 +5,13 @@ import { weekKeyOf } from '@/lib/dates'
 import { blankDoc, blankFitnessDay, blankNutritionDay, blankWeek } from '@/lib/factory'
 import { upgradeDoc } from '@/lib/fitness-test'
 import type { StorageAdapter } from '@/lib/storage/adapter'
-import { indexedDbAdapter, requestPersistentStorage } from '@/lib/storage/indexeddb'
+import { requestPersistentStorage } from '@/lib/storage/indexeddb'
 import { clearJournal, newestDoc, readJournal, writeJournal } from '@/lib/storage/journal'
+import { notifyLocalChange, shouldDiscardUnsaved, startSync } from '@/lib/sync/runtime'
+import { syncedStorage } from '@/lib/sync/storage'
 import type { DayIndex, HubDoc, Member, WeekData, WeekKey } from '@/lib/types'
 
-export const storage: StorageAdapter = indexedDbAdapter
+export const storage: StorageAdapter = syncedStorage
 
 const SAVE_DELAY_MS = 300
 const UNDO_WINDOW_MS = 6000
@@ -60,9 +62,13 @@ function scheduleSave() {
   saveTimer ??= setTimeout(flushSave, SAVE_DELAY_MS)
 }
 
+/** Writes any pending edits now, rather than after the usual short delay. */
+export const saveNow = () => flushSave()
+
 /** The page may be about to die: secure the latest edits synchronously first. */
 function saveBeforeHiding() {
-  if (!dirty) return
+  // Another tab is replacing this device's data with the synced copy.
+  if (!dirty || shouldDiscardUnsaved()) return
   writeJournal(useHub.getState().doc)
   void flushSave()
 }
@@ -89,6 +95,7 @@ export const useHub = create<HubStore>((set, get) => ({
       set({ status: 'error' })
       return
     }
+    void startSync({ getDoc: () => get().doc, applyDoc: (doc) => get().replaceDoc(doc) })
     set({ persistent: await requestPersistentStorage() })
   },
 
@@ -117,6 +124,11 @@ channel?.addEventListener('message', async () => {
   if (!doc || dirty) return
   upgradeDoc(doc)
   useHub.setState({ doc })
+})
+
+// Every change, typed here or arriving from another tab, is offered to sync.
+useHub.subscribe((state, previous) => {
+  if (state.doc !== previous.doc && state.status === 'ready') notifyLocalChange()
 })
 
 // A closing or backgrounded tab must not lose the last keystrokes.
